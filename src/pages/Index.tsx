@@ -174,6 +174,9 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Real Projects */}
+      <RealProjectsSection />
+
       {/* Final CTA */}
       <section className="py-20 md:py-32 bg-secondary">
         <div className="max-w-7xl mx-auto px-4 md:px-8 text-center">
