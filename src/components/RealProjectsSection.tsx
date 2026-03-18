@@ -14,9 +14,10 @@ export interface RealVideo {
 
 // ── Paste your real video URLs here ──────────────────────────
 const realVideos: RealVideo[] = [
-  // Example:
-  // { id: "1", url: "https://www.instagram.com/reel/ABC123/", title: "PORSCHE 911 EM ALUMÍNIO", platform: "instagram" },
-  // { id: "2", url: "https://www.tiktok.com/@quadrzz/video/123456", title: "UNBOXING QUADRO MDF", platform: "tiktok" },
+  { id: "1", url: "https://www.instagram.com/reel/DSDAGIFEbs8/", title: "PROJETO CLIENTE", platform: "instagram" },
+  { id: "2", url: "https://www.instagram.com/quadrzzz/reel/DVbZnGwka8H/", title: "QUADRO EM ALUMÍNIO", platform: "instagram" },
+  { id: "3", url: "https://www.instagram.com/quadrzzz/reel/DPmRJH8jBKa/", title: "RESULTADO FINAL", platform: "instagram" },
+  { id: "4", url: "https://www.instagram.com/quadrzzz/reel/DVRN3VVEcTM/", title: "ENTREGA PREMIUM", platform: "instagram" },
 ];
 
 function getEmbedUrl(video: RealVideo): string {
