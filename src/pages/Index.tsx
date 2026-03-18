@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import ProductCard from "@/components/ProductCard";
+import RealProjectsSection from "@/components/RealProjectsSection";
 import { products, categories } from "@/data/products";
 import heroImage from "@/assets/hero-main.jpg";
 import beforeAfterImage from "@/assets/before-after.jpg";
@@ -172,6 +173,9 @@ const Index = () => {
           </div>
         </div>
       </section>
+
+      {/* Real Projects */}
+      <RealProjectsSection />
 
       {/* Final CTA */}
       <section className="py-20 md:py-32 bg-secondary">
