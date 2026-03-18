@@ -2,15 +2,47 @@ import { useParams, Link } from "react-router-dom";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { products } from "@/data/products";
+import { products as staticProducts } from "@/data/products";
+import { useProduct } from "@/hooks/useProducts";
 import MobileConversionBar from "@/components/MobileConversionBar";
 import { Check } from "lucide-react";
 
 const ProductDetail = () => {
   const { id } = useParams();
-  const product = products.find((p) => p.id === id);
+  
+  // Try static first
+  const staticProduct = staticProducts.find((p) => p.id === id);
+  
+  // Try DB (only if not static)
+  const { data: dbProduct, isLoading } = useProduct(!staticProduct && id ? id : "");
+
   const [selectedSize, setSelectedSize] = useState(0);
   const [selectedMaterial, setSelectedMaterial] = useState(0);
+
+  // Normalize product data
+  const product = staticProduct
+    ? staticProduct
+    : dbProduct
+    ? {
+        id: dbProduct.id,
+        name: dbProduct.name,
+        category: dbProduct.category,
+        categorySlug: dbProduct.category_slug,
+        price: dbProduct.price,
+        image: dbProduct.image_url || "",
+        description: dbProduct.description || "",
+        sizes: dbProduct.sizes,
+        materials: dbProduct.materials,
+      }
+    : null;
+
+  if (isLoading && !staticProduct) {
+    return (
+      <main className="pt-28 pb-20 text-center">
+        <p className="text-muted-foreground font-body">Carregando...</p>
+      </main>
+    );
+  }
 
   if (!product) {
     return (
@@ -34,7 +66,6 @@ const ProductDetail = () => {
         </Link>
 
         <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16">
-          {/* Image */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -44,7 +75,6 @@ const ProductDetail = () => {
             <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
           </motion.div>
 
-          {/* Info */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -60,7 +90,6 @@ const ProductDetail = () => {
               {product.description}
             </p>
 
-            {/* Sizes */}
             <div className="mt-8">
               <p className="text-xs font-display tracking-widest mb-3">TAMANHO</p>
               <div className="flex flex-wrap gap-2">
@@ -78,7 +107,6 @@ const ProductDetail = () => {
               </div>
             </div>
 
-            {/* Material */}
             <div className="mt-6">
               <p className="text-xs font-display tracking-widest mb-3">MATERIAL</p>
               <div className="flex flex-wrap gap-2">
@@ -96,14 +124,12 @@ const ProductDetail = () => {
               </div>
             </div>
 
-            {/* Buy */}
             <div className="mt-8 hidden md:block">
               <Button variant="metal" size="xl" onClick={handleBuy} className="w-full">
                 COMPRAR AGORA
               </Button>
             </div>
 
-            {/* Benefits */}
             <div className="mt-10 space-y-3">
               {[
                 "Impressão HD em alta resolução",
@@ -118,7 +144,6 @@ const ProductDetail = () => {
               ))}
             </div>
 
-            {/* Specs */}
             <div className="mt-10 border-t border-border pt-6 space-y-4">
               <h3 className="text-xs tracking-widest">ESPECIFICAÇÕES</h3>
               <div className="grid grid-cols-2 gap-4 text-xs font-body">

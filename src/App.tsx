@@ -11,6 +11,8 @@ import Collection from "./pages/Collection";
 import ProductDetail from "./pages/ProductDetail";
 import Customize from "./pages/Customize";
 import About from "./pages/About";
+import AdminLogin from "./pages/AdminLogin";
+import Manager from "./pages/Manager";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -28,6 +30,8 @@ const App = () => (
           <Route path="/produto/:id" element={<ProductDetail />} />
           <Route path="/personalizar" element={<Customize />} />
           <Route path="/sobre" element={<About />} />
+          <Route path="/admin" element={<AdminLogin />} />
+          <Route path="/manager" element={<Manager />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         <Footer />
