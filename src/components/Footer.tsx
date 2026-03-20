@@ -34,7 +34,7 @@ const Footer = () => (
             Fale conosco pelo WhatsApp para encomendas especiais e dúvidas.
           </p>
           <a
-            href="https://wa.me/5500000000000"
+            href="https://wa.me/5581991169932"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-block mt-3 text-sm text-foreground font-display tracking-wider hover:opacity-80 transition-opacity"

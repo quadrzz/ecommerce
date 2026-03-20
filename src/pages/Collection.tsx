@@ -3,6 +3,10 @@ import ProductCard from "@/components/ProductCard";
 import { products as staticProducts, categories } from "@/data/products";
 import { useProducts, type DbProduct } from "@/hooks/useProducts";
 import { motion } from "framer-motion";
+import { useState } from "react";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Search } from "lucide-react";
 
 // Merge static + DB products into a unified format
 function mergeProducts(dbProducts: DbProduct[] | undefined) {
@@ -24,38 +28,80 @@ const Collection = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const activeCat = searchParams.get("cat") || "todos";
   const { data: dbProducts } = useProducts();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortBy, setSortBy] = useState("default");
 
   const allProducts = mergeProducts(dbProducts);
 
-  const filtered = activeCat === "todos"
+  let filtered = activeCat === "todos"
     ? allProducts
     : allProducts.filter((p) => p.categorySlug === activeCat);
+
+  if (searchQuery.trim()) {
+    filtered = filtered.filter(p => 
+      p.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+      p.description?.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }
+
+  if (sortBy === "price-asc") {
+    filtered.sort((a, b) => a.price - b.price);
+  } else if (sortBy === "price-desc") {
+    filtered.sort((a, b) => b.price - a.price);
+  } else if (sortBy === "name-asc") {
+    filtered.sort((a, b) => a.name.localeCompare(b.name));
+  }
 
   return (
     <main className="pt-28 pb-20">
       <div className="max-w-7xl mx-auto px-4 md:px-8">
         <h1 className="text-3xl md:text-5xl mb-8">COLEÇÃO</h1>
         
-        <div className="flex flex-wrap gap-3 mb-12">
-          <button
-            onClick={() => setSearchParams({})}
-            className={`text-xs font-display tracking-widest px-4 py-2 border transition-colors ${
-              activeCat === "todos" ? "border-foreground text-foreground" : "border-border text-muted-foreground hover:border-foreground/40"
-            }`}
-          >
-            TODOS
-          </button>
-          {categories.map((cat) => (
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
+          <div className="flex flex-wrap gap-2">
             <button
-              key={cat.slug}
-              onClick={() => setSearchParams({ cat: cat.slug })}
+              onClick={() => setSearchParams({})}
               className={`text-xs font-display tracking-widest px-4 py-2 border transition-colors ${
-                activeCat === cat.slug ? "border-foreground text-foreground" : "border-border text-muted-foreground hover:border-foreground/40"
+                activeCat === "todos" ? "border-foreground text-foreground" : "border-border text-muted-foreground hover:border-foreground/40"
               }`}
             >
-              {cat.name.toUpperCase()}
+              TODOS
             </button>
-          ))}
+            {categories.map((cat) => (
+              <button
+                key={cat.slug}
+                onClick={() => setSearchParams({ cat: cat.slug })}
+                className={`text-xs font-display tracking-widest px-4 py-2 border transition-colors ${
+                  activeCat === cat.slug ? "border-foreground text-foreground" : "border-border text-muted-foreground hover:border-foreground/40"
+                }`}
+              >
+                {cat.name.toUpperCase()}
+              </button>
+            ))}
+          </div>
+
+          <div className="flex flex-col sm:flex-row w-full md:w-auto gap-3">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Buscar quadros..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-9 bg-secondary border-border focus-visible:ring-foreground/20 w-full md:w-[250px] font-body text-sm h-10"
+              />
+            </div>
+            <Select value={sortBy} onValueChange={setSortBy}>
+              <SelectTrigger className="w-full sm:w-[180px] bg-secondary border-border font-body text-sm h-10">
+                <SelectValue placeholder="Ordenar por" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="default">Relevância</SelectItem>
+                <SelectItem value="price-asc">Menor Preço</SelectItem>
+                <SelectItem value="price-desc">Maior Preço</SelectItem>
+                <SelectItem value="name-asc">Ordem Alfabética</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
         <motion.div

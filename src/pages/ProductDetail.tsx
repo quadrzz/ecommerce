@@ -1,4 +1,4 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -6,9 +6,11 @@ import { products as staticProducts } from "@/data/products";
 import { useProduct } from "@/hooks/useProducts";
 import MobileConversionBar from "@/components/MobileConversionBar";
 import { Check } from "lucide-react";
+import { useCart } from "@/contexts/CartContext";
 
 const ProductDetail = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   
   // Try static first
   const staticProduct = staticProducts.find((p) => p.id === id);
@@ -53,9 +55,32 @@ const ProductDetail = () => {
     );
   }
 
-  const handleBuy = () => {
-    const msg = `Olá! Quero comprar o quadro "${product.name}" — ${product.sizes[selectedSize]}, ${product.materials[selectedMaterial]}. Valor: R$ ${product.price.toFixed(2).replace(".", ",")}`;
-    window.open(`https://wa.me/5500000000000?text=${encodeURIComponent(msg)}`, "_blank");
+  const { addToCart, setIsCartOpen } = useCart();
+
+  const handleAddToCart = () => {
+    addToCart({
+      productId: product.id,
+      name: product.name,
+      price: product.price,
+      image: product.image,
+      size: product.sizes[selectedSize],
+      material: product.materials[selectedMaterial],
+      quantity: 1,
+    });
+    setIsCartOpen(true);
+  };
+
+  const handleBuyNow = () => {
+    addToCart({
+      productId: product.id,
+      name: product.name,
+      price: product.price,
+      image: product.image,
+      size: product.sizes[selectedSize],
+      material: product.materials[selectedMaterial],
+      quantity: 1,
+    });
+    navigate("/checkout");
   };
 
   return (
@@ -124,8 +149,11 @@ const ProductDetail = () => {
               </div>
             </div>
 
-            <div className="mt-8 hidden md:block">
-              <Button variant="metal" size="xl" onClick={handleBuy} className="w-full">
+            <div className="mt-8 hidden md:flex gap-4">
+              <Button variant="outline" size="xl" onClick={handleAddToCart} className="flex-1">
+                ADICIONAR AO CARRINHO
+              </Button>
+              <Button variant="metal" size="xl" onClick={handleBuyNow} className="flex-1">
                 COMPRAR AGORA
               </Button>
             </div>
@@ -169,7 +197,7 @@ const ProductDetail = () => {
         </div>
       </div>
 
-      <MobileConversionBar onBuy={handleBuy} />
+      <MobileConversionBar onAddCart={handleAddToCart} onBuy={handleBuyNow} />
     </main>
   );
 };

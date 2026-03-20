@@ -1,7 +1,9 @@
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X } from "lucide-react";
+import { Menu, X, ShoppingBag } from "lucide-react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { CartDrawer } from "./CartDrawer";
+import { useCart } from "@/contexts/CartContext";
 
 const navLinks = [
   { label: "INÍCIO", path: "/" },
@@ -13,6 +15,7 @@ const navLinks = [
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const location = useLocation();
+  const { itemCount } = useCart();
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50">
@@ -44,13 +47,26 @@ const Header = () => {
             ))}
           </div>
 
-          {/* Mobile menu button */}
-          <button
-            onClick={() => setMenuOpen(!menuOpen)}
-            className="md:hidden text-foreground"
-          >
-            {menuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
+          {/* Cart & Mobile menu button */}
+          <div className="flex items-center gap-4">
+            <CartDrawer>
+              <button className="relative p-2 text-foreground hover:opacity-70 transition-opacity">
+                <ShoppingBag size={20} />
+                {itemCount > 0 && (
+                  <span className="absolute top-0 right-0 bg-primary text-primary-foreground text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold">
+                    {itemCount}
+                  </span>
+                )}
+              </button>
+            </CartDrawer>
+
+            <button
+              onClick={() => setMenuOpen(!menuOpen)}
+              className="md:hidden p-2 text-foreground"
+            >
+              {menuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+          </div>
         </div>
       </nav>
 

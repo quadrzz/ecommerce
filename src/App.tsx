@@ -14,13 +14,16 @@ import About from "./pages/About";
 import AdminLogin from "./pages/AdminLogin";
 import Manager from "./pages/Manager";
 import NotFound from "./pages/NotFound";
+import { CartProvider } from "./contexts/CartContext";
+import Checkout from "./pages/Checkout";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
+    <CartProvider>
+      <TooltipProvider>
+        <Toaster />
       <Sonner />
       <BrowserRouter>
         <Header />
@@ -30,6 +33,7 @@ const App = () => (
           <Route path="/produto/:id" element={<ProductDetail />} />
           <Route path="/personalizar" element={<Customize />} />
           <Route path="/sobre" element={<About />} />
+          <Route path="/checkout" element={<Checkout />} />
           <Route path="/admin" element={<AdminLogin />} />
           <Route path="/manager" element={<Manager />} />
           <Route path="*" element={<NotFound />} />
@@ -37,7 +41,8 @@ const App = () => (
         <Footer />
         <WhatsAppFAB />
       </BrowserRouter>
-    </TooltipProvider>
+      </TooltipProvider>
+    </CartProvider>
   </QueryClientProvider>
 );
 
