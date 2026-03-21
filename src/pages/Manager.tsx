@@ -3,8 +3,9 @@ import { useAuth } from "@/hooks/useAuth";
 import { useProducts, useCreateProduct, useUpdateProduct, useDeleteProduct, uploadProductImage, type DbProduct } from "@/hooks/useProducts";
 import { Navigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Pencil, Trash2, Plus, LogOut, Image, X } from "lucide-react";
+import { Pencil, Trash2, Plus, LogOut, Image, X, KeyRound } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 const defaultSizes = ["30x40cm", "40x60cm", "60x90cm", "80x120cm"];
 const defaultMaterials = ["Alumínio Premium", "MDF Alta Densidade"];
@@ -39,6 +40,9 @@ const Manager = () => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
   const [uploading, setUploading] = useState(false);
+  const [showPasswordForm, setShowPasswordForm] = useState(false);
+  const [passwordForm, setPasswordForm] = useState({ current: "", new: "", confirm: "" });
+  const [changingPassword, setChangingPassword] = useState(false);
 
   if (loading) {
     return (
@@ -136,6 +140,37 @@ const Manager = () => {
     }));
   };
 
+  const handleChangePassword = async () => {
+    if (passwordForm.new !== passwordForm.confirm) {
+      toast.error("As senhas não coincidem.");
+      return;
+    }
+    if (passwordForm.new.length < 6) {
+      toast.error("A nova senha deve ter pelo menos 6 caracteres.");
+      return;
+    }
+    setChangingPassword(true);
+    // Verify current password by re-signing in
+    const { error: signInErr } = await supabase.auth.signInWithPassword({
+      email: user!.email!,
+      password: passwordForm.current,
+    });
+    if (signInErr) {
+      toast.error("Senha atual incorreta.");
+      setChangingPassword(false);
+      return;
+    }
+    const { error } = await supabase.auth.updateUser({ password: passwordForm.new });
+    if (error) {
+      toast.error("Erro ao trocar senha.");
+    } else {
+      toast.success("Senha alterada com sucesso!");
+      setShowPasswordForm(false);
+      setPasswordForm({ current: "", new: "", confirm: "" });
+    }
+    setChangingPassword(false);
+  };
+
   return (
     <main className="pt-28 pb-20">
       <div className="max-w-5xl mx-auto px-4 md:px-8">
@@ -157,11 +192,56 @@ const Manager = () => {
             >
               <Plus size={14} /> NOVO PRODUTO
             </Button>
+            <Button variant="ghost" size="sm" onClick={() => setShowPasswordForm(!showPasswordForm)}>
+              <KeyRound size={14} />
+            </Button>
             <Button variant="ghost" size="sm" onClick={signOut}>
               <LogOut size={14} />
             </Button>
           </div>
         </div>
+
+        {/* Password change form */}
+        {showPasswordForm && (
+          <div className="mb-12 bg-secondary border border-border p-6 md:p-8 space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-sm font-display tracking-widest">TROCAR SENHA</h2>
+              <button onClick={() => { setShowPasswordForm(false); setPasswordForm({ current: "", new: "", confirm: "" }); }}>
+                <X size={18} className="text-muted-foreground hover:text-foreground transition-colors" />
+              </button>
+            </div>
+            <div>
+              <label className="text-xs font-display tracking-widest mb-2 block">SENHA ATUAL</label>
+              <input
+                type="password"
+                value={passwordForm.current}
+                onChange={(e) => setPasswordForm((f) => ({ ...f, current: e.target.value }))}
+                className="w-full max-w-sm bg-background border border-border text-foreground font-body text-sm p-3 focus:outline-none focus:border-foreground/40 transition-colors"
+              />
+            </div>
+            <div>
+              <label className="text-xs font-display tracking-widest mb-2 block">NOVA SENHA</label>
+              <input
+                type="password"
+                value={passwordForm.new}
+                onChange={(e) => setPasswordForm((f) => ({ ...f, new: e.target.value }))}
+                className="w-full max-w-sm bg-background border border-border text-foreground font-body text-sm p-3 focus:outline-none focus:border-foreground/40 transition-colors"
+              />
+            </div>
+            <div>
+              <label className="text-xs font-display tracking-widest mb-2 block">CONFIRMAR NOVA SENHA</label>
+              <input
+                type="password"
+                value={passwordForm.confirm}
+                onChange={(e) => setPasswordForm((f) => ({ ...f, confirm: e.target.value }))}
+                className="w-full max-w-sm bg-background border border-border text-foreground font-body text-sm p-3 focus:outline-none focus:border-foreground/40 transition-colors"
+              />
+            </div>
+            <Button variant="metal" size="lg" onClick={handleChangePassword} disabled={changingPassword}>
+              {changingPassword ? "ALTERANDO..." : "ALTERAR SENHA"}
+            </Button>
+          </div>
+        )}
 
         {/* Form */}
         {showForm && (
