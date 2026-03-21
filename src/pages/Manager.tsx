@@ -172,6 +172,8 @@ const Manager = () => {
   };
 
   return (
+    <main className="pt-28 pb-20">
+      <div className="max-w-5xl mx-auto px-4 md:px-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-12">
           <div>
