@@ -3,8 +3,9 @@ import { useAuth } from "@/hooks/useAuth";
 import { useProducts, useCreateProduct, useUpdateProduct, useDeleteProduct, uploadProductImage, type DbProduct } from "@/hooks/useProducts";
 import { Navigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Pencil, Trash2, Plus, LogOut, Image, X } from "lucide-react";
+import { Pencil, Trash2, Plus, LogOut, Image, X, KeyRound } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 const defaultSizes = ["30x40cm", "40x60cm", "60x90cm", "80x120cm"];
 const defaultMaterials = ["Alumínio Premium", "MDF Alta Densidade"];
