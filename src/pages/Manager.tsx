@@ -140,9 +140,38 @@ const Manager = () => {
     }));
   };
 
+  const handleChangePassword = async () => {
+    if (passwordForm.new !== passwordForm.confirm) {
+      toast.error("As senhas não coincidem.");
+      return;
+    }
+    if (passwordForm.new.length < 6) {
+      toast.error("A nova senha deve ter pelo menos 6 caracteres.");
+      return;
+    }
+    setChangingPassword(true);
+    // Verify current password by re-signing in
+    const { error: signInErr } = await supabase.auth.signInWithPassword({
+      email: user!.email!,
+      password: passwordForm.current,
+    });
+    if (signInErr) {
+      toast.error("Senha atual incorreta.");
+      setChangingPassword(false);
+      return;
+    }
+    const { error } = await supabase.auth.updateUser({ password: passwordForm.new });
+    if (error) {
+      toast.error("Erro ao trocar senha.");
+    } else {
+      toast.success("Senha alterada com sucesso!");
+      setShowPasswordForm(false);
+      setPasswordForm({ current: "", new: "", confirm: "" });
+    }
+    setChangingPassword(false);
+  };
+
   return (
-    <main className="pt-28 pb-20">
-      <div className="max-w-5xl mx-auto px-4 md:px-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-12">
           <div>
