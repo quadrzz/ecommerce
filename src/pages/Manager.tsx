@@ -192,11 +192,56 @@ const Manager = () => {
             >
               <Plus size={14} /> NOVO PRODUTO
             </Button>
+            <Button variant="ghost" size="sm" onClick={() => setShowPasswordForm(!showPasswordForm)}>
+              <KeyRound size={14} />
+            </Button>
             <Button variant="ghost" size="sm" onClick={signOut}>
               <LogOut size={14} />
             </Button>
           </div>
         </div>
+
+        {/* Password change form */}
+        {showPasswordForm && (
+          <div className="mb-12 bg-secondary border border-border p-6 md:p-8 space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-sm font-display tracking-widest">TROCAR SENHA</h2>
+              <button onClick={() => { setShowPasswordForm(false); setPasswordForm({ current: "", new: "", confirm: "" }); }}>
+                <X size={18} className="text-muted-foreground hover:text-foreground transition-colors" />
+              </button>
+            </div>
+            <div>
+              <label className="text-xs font-display tracking-widest mb-2 block">SENHA ATUAL</label>
+              <input
+                type="password"
+                value={passwordForm.current}
+                onChange={(e) => setPasswordForm((f) => ({ ...f, current: e.target.value }))}
+                className="w-full max-w-sm bg-background border border-border text-foreground font-body text-sm p-3 focus:outline-none focus:border-foreground/40 transition-colors"
+              />
+            </div>
+            <div>
+              <label className="text-xs font-display tracking-widest mb-2 block">NOVA SENHA</label>
+              <input
+                type="password"
+                value={passwordForm.new}
+                onChange={(e) => setPasswordForm((f) => ({ ...f, new: e.target.value }))}
+                className="w-full max-w-sm bg-background border border-border text-foreground font-body text-sm p-3 focus:outline-none focus:border-foreground/40 transition-colors"
+              />
+            </div>
+            <div>
+              <label className="text-xs font-display tracking-widest mb-2 block">CONFIRMAR NOVA SENHA</label>
+              <input
+                type="password"
+                value={passwordForm.confirm}
+                onChange={(e) => setPasswordForm((f) => ({ ...f, confirm: e.target.value }))}
+                className="w-full max-w-sm bg-background border border-border text-foreground font-body text-sm p-3 focus:outline-none focus:border-foreground/40 transition-colors"
+              />
+            </div>
+            <Button variant="metal" size="lg" onClick={handleChangePassword} disabled={changingPassword}>
+              {changingPassword ? "ALTERANDO..." : "ALTERAR SENHA"}
+            </Button>
+          </div>
+        )}
 
         {/* Form */}
         {showForm && (
