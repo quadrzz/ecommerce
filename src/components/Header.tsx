@@ -1,9 +1,10 @@
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, ShoppingBag } from "lucide-react";
+import { Menu, X, ShoppingBag, Instagram, Facebook } from "lucide-react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { CartDrawer } from "./CartDrawer";
 import { useCart } from "@/contexts/CartContext";
+import { useSiteConfig } from "@/hooks/useSiteConfig";
 
 const navLinks = [
   { label: "INÍCIO", path: "/" },
@@ -13,9 +14,11 @@ const navLinks = [
 ];
 
 const Header = () => {
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
   const { itemCount } = useCart();
+  const { data: config } = useSiteConfig();
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50">
@@ -26,9 +29,15 @@ const Header = () => {
       
       <nav className="bg-background/80 backdrop-blur-md border-b border-border">
         <div className="max-w-7xl mx-auto px-4 md:px-8 flex items-center justify-between h-16">
-          <Link to="/" className="font-display text-2xl text-foreground tracking-tighter">
-            QUADRZZ
-          </Link>
+          <div className="flex-1 text-center md:text-left">
+            <Link to="/" className="text-2xl font-display tracking-widest leading-none z-50 inline-block">
+              {config?.logo_url ? (
+                <img src={config.logo_url} alt="Quadrzz" className="h-6 md:h-8 object-contain" />
+              ) : (
+                "QUADRZZ"
+              )}
+            </Link>
+          </div>
           
           {/* Desktop nav */}
           <div className="hidden md:flex items-center gap-8">
@@ -61,10 +70,10 @@ const Header = () => {
             </CartDrawer>
 
             <button
-              onClick={() => setMenuOpen(!menuOpen)}
-              className="md:hidden p-2 text-foreground"
+              className="md:hidden p-2 -mr-2 text-foreground"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             >
-              {menuOpen ? <X size={24} /> : <Menu size={24} />}
+              {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
           </div>
         </div>
@@ -72,7 +81,7 @@ const Header = () => {
 
       {/* Mobile menu */}
       <AnimatePresence>
-        {menuOpen && (
+        {isMobileMenuOpen && (
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}

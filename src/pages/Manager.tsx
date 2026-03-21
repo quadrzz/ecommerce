@@ -1,45 +1,30 @@
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import { useProducts, useCreateProduct, useUpdateProduct, useDeleteProduct, uploadProductImage, type DbProduct } from "@/hooks/useProducts";
 import { Navigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Pencil, Trash2, Plus, LogOut, Image, X, KeyRound } from "lucide-react";
+import { 
+  LayoutDashboard, 
+  Package, 
+  Settings, 
+  LogOut, 
+  PanelLeftClose, 
+  PanelRightClose, 
+  Menu,
+  KeyRound,
+  X
+} from "lucide-react";
+import { DashboardTab } from "@/components/manager/DashboardTab";
+import { ProductManager } from "@/components/manager/ProductManager";
+import { SiteSettings } from "@/components/manager/SiteSettings";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
-const defaultSizes = ["30x40cm", "40x60cm", "60x90cm", "80x120cm"];
-const defaultMaterials = ["Alumínio Premium", "MDF Alta Densidade"];
-const categoryOptions = [
-  { name: "Carros", slug: "carros" },
-  { name: "Frases", slug: "frases" },
-  { name: "Personalizados", slug: "personalizados" },
-  { name: "Minimalistas", slug: "minimalistas" },
-  { name: "Lifestyle", slug: "lifestyle" },
-];
-
-const emptyForm = {
-  name: "",
-  category: "Carros",
-  category_slug: "carros",
-  price: 0,
-  description: "",
-  sizes: defaultSizes,
-  materials: defaultMaterials,
-  image_url: "",
-  is_active: true,
-};
+type Tab = "dashboard" | "products" | "settings";
 
 const Manager = () => {
   const { user, isAdmin, loading, signOut } = useAuth();
-  const { data: products, isLoading: productsLoading } = useProducts();
-  const createProduct = useCreateProduct();
-  const updateProduct = useUpdateProduct();
-  const deleteProduct = useDeleteProduct();
-
-  const [showForm, setShowForm] = useState(false);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [form, setForm] = useState(emptyForm);
-  const [uploading, setUploading] = useState(false);
+  const [activeTab, setActiveTab] = useState<Tab>("dashboard");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showPasswordForm, setShowPasswordForm] = useState(false);
   const [passwordForm, setPasswordForm] = useState({ current: "", new: "", confirm: "" });
   const [changingPassword, setChangingPassword] = useState(false);
@@ -56,90 +41,6 @@ const Manager = () => {
     return <Navigate to="/admin" replace />;
   }
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setUploading(true);
-    try {
-      const url = await uploadProductImage(file);
-      setForm((f) => ({ ...f, image_url: url }));
-      toast.success("Imagem enviada!");
-    } catch {
-      toast.error("Erro ao enviar imagem.");
-    }
-    setUploading(false);
-  };
-
-  const handleCategoryChange = (slug: string) => {
-    const cat = categoryOptions.find((c) => c.slug === slug);
-    if (cat) setForm((f) => ({ ...f, category: cat.name, category_slug: cat.slug }));
-  };
-
-  const handleSave = async () => {
-    if (!form.name || !form.price) {
-      toast.error("Nome e preço são obrigatórios.");
-      return;
-    }
-    try {
-      if (editingId) {
-        await updateProduct.mutateAsync({ id: editingId, ...form });
-        toast.success("Produto atualizado!");
-      } else {
-        await createProduct.mutateAsync(form);
-        toast.success("Produto criado!");
-      }
-      setShowForm(false);
-      setEditingId(null);
-      setForm(emptyForm);
-    } catch {
-      toast.error("Erro ao salvar produto.");
-    }
-  };
-
-  const handleEdit = (p: DbProduct) => {
-    setForm({
-      name: p.name,
-      category: p.category,
-      category_slug: p.category_slug,
-      price: p.price,
-      description: p.description || "",
-      sizes: p.sizes,
-      materials: p.materials,
-      image_url: p.image_url || "",
-      is_active: p.is_active ?? true,
-    });
-    setEditingId(p.id);
-    setShowForm(true);
-  };
-
-  const handleDelete = async (id: string) => {
-    if (!confirm("Tem certeza que deseja excluir este produto?")) return;
-    try {
-      await deleteProduct.mutateAsync(id);
-      toast.success("Produto excluído.");
-    } catch {
-      toast.error("Erro ao excluir.");
-    }
-  };
-
-  const handleSizeToggle = (size: string) => {
-    setForm((f) => ({
-      ...f,
-      sizes: f.sizes.includes(size)
-        ? f.sizes.filter((s) => s !== size)
-        : [...f.sizes, size],
-    }));
-  };
-
-  const handleMaterialToggle = (mat: string) => {
-    setForm((f) => ({
-      ...f,
-      materials: f.materials.includes(mat)
-        ? f.materials.filter((m) => m !== mat)
-        : [...f.materials, mat],
-    }));
-  };
-
   const handleChangePassword = async () => {
     if (passwordForm.new !== passwordForm.confirm) {
       toast.error("As senhas não coincidem.");
@@ -150,16 +51,18 @@ const Manager = () => {
       return;
     }
     setChangingPassword(true);
-    // Verify current password by re-signing in
+    
     const { error: signInErr } = await supabase.auth.signInWithPassword({
       email: user!.email!,
       password: passwordForm.current,
     });
+    
     if (signInErr) {
       toast.error("Senha atual incorreta.");
       setChangingPassword(false);
       return;
     }
+    
     const { error } = await supabase.auth.updateUser({ password: passwordForm.new });
     if (error) {
       toast.error("Erro ao trocar senha.");
@@ -171,290 +74,135 @@ const Manager = () => {
     setChangingPassword(false);
   };
 
+  const renderTab = () => {
+    switch (activeTab) {
+      case "dashboard": return <DashboardTab />;
+      case "products": return <ProductManager />;
+      case "settings": return <SiteSettings />;
+      default: return <DashboardTab />;
+    }
+  };
+
   return (
-    <main className="pt-28 pb-20">
-      <div className="max-w-5xl mx-auto px-4 md:px-8">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-12">
-          <div>
-            <h1 className="text-2xl md:text-4xl">MANAGER</h1>
-            <p className="text-xs text-muted-foreground font-body mt-1">{user.email}</p>
-          </div>
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                setForm(emptyForm);
-                setEditingId(null);
-                setShowForm(true);
-              }}
-            >
-              <Plus size={14} /> NOVO PRODUTO
-            </Button>
-            <Button variant="ghost" size="sm" onClick={() => setShowPasswordForm(!showPasswordForm)}>
-              <KeyRound size={14} />
-            </Button>
-            <Button variant="ghost" size="sm" onClick={signOut}>
-              <LogOut size={14} />
-            </Button>
-          </div>
+    <div className="min-h-screen bg-background flex flex-col md:flex-row pt-16 md:pt-0">
+      
+      {/* Mobile Top Nav for Manager */}
+      <div className="md:hidden fixed top-0 left-0 right-0 h-16 border-b border-border bg-background/95 backdrop-blur-md z-40 flex items-center justify-between px-4">
+        <h1 className="font-display tracking-widest text-lg">MANAGER</h1>
+        <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="p-2">
+          {mobileMenuOpen ? <PanelRightClose size={20} /> : <Menu size={20} />}
+        </button>
+      </div>
+
+      {/* Sidebar */}
+      <aside className={`
+        fixed md:relative top-16 md:top-0 left-0 w-full md:w-64 h-[calc(100vh-4rem)] md:h-screen 
+        bg-secondary/50 border-r border-border flex flex-col z-30 transition-transform duration-300
+        ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
+      `}>
+        <div className="p-6 hidden md:block">
+          <h1 className="font-display tracking-widest text-2xl">MANAGER</h1>
+          <p className="text-xs text-muted-foreground font-body mt-1 truncate">{user.email}</p>
         </div>
 
-        {/* Password change form */}
-        {showPasswordForm && (
-          <div className="mb-12 bg-secondary border border-border p-6 md:p-8 space-y-4">
-            <div className="flex items-center justify-between">
-              <h2 className="text-sm font-display tracking-widest">TROCAR SENHA</h2>
-              <button onClick={() => { setShowPasswordForm(false); setPasswordForm({ current: "", new: "", confirm: "" }); }}>
-                <X size={18} className="text-muted-foreground hover:text-foreground transition-colors" />
-              </button>
-            </div>
-            <div>
-              <label className="text-xs font-display tracking-widest mb-2 block">SENHA ATUAL</label>
-              <input
-                type="password"
-                value={passwordForm.current}
-                onChange={(e) => setPasswordForm((f) => ({ ...f, current: e.target.value }))}
-                className="w-full max-w-sm bg-background border border-border text-foreground font-body text-sm p-3 focus:outline-none focus:border-foreground/40 transition-colors"
-              />
-            </div>
-            <div>
-              <label className="text-xs font-display tracking-widest mb-2 block">NOVA SENHA</label>
-              <input
-                type="password"
-                value={passwordForm.new}
-                onChange={(e) => setPasswordForm((f) => ({ ...f, new: e.target.value }))}
-                className="w-full max-w-sm bg-background border border-border text-foreground font-body text-sm p-3 focus:outline-none focus:border-foreground/40 transition-colors"
-              />
-            </div>
-            <div>
-              <label className="text-xs font-display tracking-widest mb-2 block">CONFIRMAR NOVA SENHA</label>
-              <input
-                type="password"
-                value={passwordForm.confirm}
-                onChange={(e) => setPasswordForm((f) => ({ ...f, confirm: e.target.value }))}
-                className="w-full max-w-sm bg-background border border-border text-foreground font-body text-sm p-3 focus:outline-none focus:border-foreground/40 transition-colors"
-              />
-            </div>
-            <Button variant="metal" size="lg" onClick={handleChangePassword} disabled={changingPassword}>
-              {changingPassword ? "ALTERANDO..." : "ALTERAR SENHA"}
-            </Button>
-          </div>
-        )}
+        <nav className="flex-1 px-4 py-6 md:py-0 space-y-2 overflow-y-auto">
+          <button
+            onClick={() => { setActiveTab("dashboard"); setMobileMenuOpen(false); }}
+            className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-display tracking-widest transition-colors
+              ${activeTab === "dashboard" ? "bg-foreground text-background" : "hover:bg-accent/10"}`}
+          >
+            <LayoutDashboard size={16} /> DASHBOARD
+          </button>
+          <button
+            onClick={() => { setActiveTab("products"); setMobileMenuOpen(false); }}
+            className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-display tracking-widest transition-colors
+              ${activeTab === "products" ? "bg-foreground text-background" : "hover:bg-accent/10"}`}
+          >
+            <Package size={16} /> PRODUTOS
+          </button>
+          <button
+            onClick={() => { setActiveTab("settings"); setMobileMenuOpen(false); }}
+            className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-display tracking-widest transition-colors
+              ${activeTab === "settings" ? "bg-foreground text-background" : "hover:bg-accent/10"}`}
+          >
+            <Settings size={16} /> SETUP DO SITE
+          </button>
+        </nav>
 
-        {/* Form */}
-        {showForm && (
-          <div className="mb-12 bg-secondary border border-border p-6 md:p-8 space-y-6">
-            <div className="flex items-center justify-between">
-              <h2 className="text-sm font-display tracking-widest">
-                {editingId ? "EDITAR PRODUTO" : "NOVO PRODUTO"}
-              </h2>
-              <button onClick={() => { setShowForm(false); setEditingId(null); setForm(emptyForm); }}>
-                <X size={18} className="text-muted-foreground hover:text-foreground transition-colors" />
-              </button>
-            </div>
+        <div className="p-4 mt-auto border-t border-border space-y-2">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="w-full justify-start text-muted-foreground hover:text-foreground" 
+            onClick={() => setShowPasswordForm(!showPasswordForm)}
+          >
+            <KeyRound size={16} className="mr-2" /> SENHA
+          </Button>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="w-full justify-start text-muted-foreground hover:text-foreground" 
+            onClick={signOut}
+          >
+            <LogOut size={16} className="mr-2" /> SAIR
+          </Button>
+        </div>
+      </aside>
 
-            {/* Image upload */}
-            <div>
-              <label className="text-xs font-display tracking-widest mb-2 block">IMAGEM</label>
-              {form.image_url ? (
-                <div className="relative w-40 aspect-[3/4] bg-muted metal-border overflow-hidden">
-                  <img src={form.image_url} alt="Preview" className="w-full h-full object-cover" />
-                  <button
-                    onClick={() => setForm((f) => ({ ...f, image_url: "" }))}
-                    className="absolute top-1 right-1 bg-background/80 p-1"
-                  >
-                    <X size={12} />
-                  </button>
+      {/* Main Content */}
+      <main className="flex-1 overflow-y-auto w-full">
+        <div className="p-4 md:p-8 md:pt-16 max-w-6xl mx-auto">
+          {/* Password change form */}
+          {showPasswordForm && (
+            <div className="mb-12 bg-secondary border border-border p-6 md:p-8 space-y-4 metal-border">
+              <div className="flex items-center justify-between">
+                <h2 className="text-sm font-display tracking-widest">TROCAR SENHA</h2>
+                <button onClick={() => { setShowPasswordForm(false); setPasswordForm({ current: "", new: "", confirm: "" }); }}>
+                  <X size={18} className="text-muted-foreground hover:text-foreground transition-colors" />
+                </button>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="text-xs font-display tracking-widest mb-2 block">SENHA ATUAL</label>
+                  <input
+                    type="password"
+                    value={passwordForm.current}
+                    onChange={(e) => setPasswordForm((f) => ({ ...f, current: e.target.value }))}
+                    className="w-full bg-background border border-border text-foreground font-body text-sm p-3 focus:outline-none focus:border-foreground/40 transition-colors"
+                  />
                 </div>
-              ) : (
-                <label className="flex items-center justify-center w-40 aspect-[3/4] border border-dashed border-border hover:border-foreground/30 cursor-pointer transition-colors bg-muted">
-                  <div className="text-center">
-                    <Image size={20} strokeWidth={1} className="mx-auto text-muted-foreground mb-1" />
-                    <span className="text-xs text-muted-foreground font-body">
-                      {uploading ? "Enviando..." : "Upload"}
-                    </span>
-                  </div>
-                  <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} disabled={uploading} />
-                </label>
-              )}
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="text-xs font-display tracking-widest mb-2 block">NOME</label>
-                <input
-                  value={form.name}
-                  onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-                  className="w-full bg-background border border-border text-foreground font-body text-sm p-3 focus:outline-none focus:border-foreground/40 transition-colors"
-                  placeholder="Nome do produto"
-                />
-              </div>
-              <div>
-                <label className="text-xs font-display tracking-widest mb-2 block">PREÇO (R$)</label>
-                <input
-                  type="number"
-                  value={form.price || ""}
-                  onChange={(e) => setForm((f) => ({ ...f, price: parseFloat(e.target.value) || 0 }))}
-                  className="w-full bg-background border border-border text-foreground font-body text-sm p-3 focus:outline-none focus:border-foreground/40 transition-colors tabular-nums"
-                  placeholder="0.00"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="text-xs font-display tracking-widest mb-2 block">CATEGORIA</label>
-              <div className="flex flex-wrap gap-2">
-                {categoryOptions.map((c) => (
-                  <button
-                    key={c.slug}
-                    onClick={() => handleCategoryChange(c.slug)}
-                    className={`text-xs font-body px-3 py-2 border transition-colors ${
-                      form.category_slug === c.slug
-                        ? "border-foreground text-foreground"
-                        : "border-border text-muted-foreground hover:border-foreground/40"
-                    }`}
-                  >
-                    {c.name.toUpperCase()}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <label className="text-xs font-display tracking-widest mb-2 block">DESCRIÇÃO</label>
-              <textarea
-                value={form.description}
-                onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
-                className="w-full h-24 bg-background border border-border text-foreground font-body text-sm p-3 resize-none focus:outline-none focus:border-foreground/40 transition-colors placeholder:text-muted-foreground"
-                placeholder="Descrição curta e impactante..."
-              />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="text-xs font-display tracking-widest mb-2 block">TAMANHOS</label>
-                <div className="flex flex-wrap gap-2">
-                  {defaultSizes.map((s) => (
-                    <button
-                      key={s}
-                      onClick={() => handleSizeToggle(s)}
-                      className={`text-xs font-body px-3 py-2 border transition-colors ${
-                        form.sizes.includes(s)
-                          ? "border-foreground text-foreground"
-                          : "border-border text-muted-foreground hover:border-foreground/40"
-                      }`}
-                    >
-                      {s}
-                    </button>
-                  ))}
+                <div>
+                  <label className="text-xs font-display tracking-widest mb-2 block">NOVA SENHA</label>
+                  <input
+                    type="password"
+                    value={passwordForm.new}
+                    onChange={(e) => setPasswordForm((f) => ({ ...f, new: e.target.value }))}
+                    className="w-full bg-background border border-border text-foreground font-body text-sm p-3 focus:outline-none focus:border-foreground/40 transition-colors"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-display tracking-widest mb-2 block">CONFIRMAR</label>
+                  <input
+                    type="password"
+                    value={passwordForm.confirm}
+                    onChange={(e) => setPasswordForm((f) => ({ ...f, confirm: e.target.value }))}
+                    className="w-full bg-background border border-border text-foreground font-body text-sm p-3 focus:outline-none focus:border-foreground/40 transition-colors"
+                  />
                 </div>
               </div>
-              <div>
-                <label className="text-xs font-display tracking-widest mb-2 block">MATERIAIS</label>
-                <div className="flex flex-wrap gap-2">
-                  {defaultMaterials.map((m) => (
-                    <button
-                      key={m}
-                      onClick={() => handleMaterialToggle(m)}
-                      className={`text-xs font-body px-3 py-2 border transition-colors ${
-                        form.materials.includes(m)
-                          ? "border-foreground text-foreground"
-                          : "border-border text-muted-foreground hover:border-foreground/40"
-                      }`}
-                    >
-                      {m}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <label className="text-xs font-display tracking-widest">ATIVO</label>
-              <button
-                onClick={() => setForm((f) => ({ ...f, is_active: !f.is_active }))}
-                className={`w-10 h-6 rounded-full transition-colors relative ${
-                  form.is_active ? "bg-foreground" : "bg-border"
-                }`}
-              >
-                <span
-                  className={`absolute top-1 w-4 h-4 rounded-full bg-background transition-transform ${
-                    form.is_active ? "left-5" : "left-1"
-                  }`}
-                />
-              </button>
-            </div>
-
-            <div className="flex gap-3 pt-2">
-              <Button variant="metal" size="lg" onClick={handleSave} disabled={createProduct.isPending || updateProduct.isPending}>
-                {editingId ? "SALVAR ALTERAÇÕES" : "CRIAR PRODUTO"}
-              </Button>
-              <Button variant="outline" size="lg" onClick={() => { setShowForm(false); setEditingId(null); setForm(emptyForm); }}>
-                CANCELAR
+              <Button variant="metal" size="lg" onClick={handleChangePassword} disabled={changingPassword}>
+                {changingPassword ? "ALTERANDO..." : "ALTERAR SENHA"}
               </Button>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Product list */}
-        {productsLoading ? (
-          <p className="text-muted-foreground font-body">Carregando produtos...</p>
-        ) : !products?.length ? (
-          <div className="text-center py-20">
-            <p className="text-muted-foreground font-body mb-4">Nenhum produto cadastrado.</p>
-            <Button
-              variant="outline"
-              onClick={() => {
-                setForm(emptyForm);
-                setEditingId(null);
-                setShowForm(true);
-              }}
-            >
-              <Plus size={14} /> ADICIONAR PRIMEIRO PRODUTO
-            </Button>
-          </div>
-        ) : (
-          <div className="space-y-3">
-            {products.map((p) => (
-              <div
-                key={p.id}
-                className={`flex items-center gap-4 bg-secondary border border-border p-4 transition-opacity ${
-                  !p.is_active ? "opacity-50" : ""
-                }`}
-              >
-                <div className="w-16 h-20 bg-muted metal-border overflow-hidden flex-shrink-0">
-                  {p.image_url ? (
-                    <img src={p.image_url} alt={p.name} className="w-full h-full object-cover" />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center">
-                      <Image size={16} className="text-muted-foreground" />
-                    </div>
-                  )}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-display tracking-wider truncate">{p.name}</p>
-                  <p className="text-xs text-muted-foreground font-body">
-                    {p.category} · R$ {p.price.toFixed(2).replace(".", ",")}
-                    {!p.is_active && " · INATIVO"}
-                  </p>
-                </div>
-                <div className="flex gap-1 flex-shrink-0">
-                  <button onClick={() => handleEdit(p)} className="p-2 text-muted-foreground hover:text-foreground transition-colors">
-                    <Pencil size={14} />
-                  </button>
-                  <button onClick={() => handleDelete(p.id)} className="p-2 text-muted-foreground hover:text-destructive transition-colors">
-                    <Trash2 size={14} />
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    </main>
+          {renderTab()}
+        </div>
+      </main>
+
+    </div>
   );
 };
 
 export default Manager;
+

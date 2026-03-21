@@ -6,6 +6,7 @@ import ProductCard from "@/components/ProductCard";
 import RealProjectsSection from "@/components/RealProjectsSection";
 import { products, categories } from "@/data/products";
 import { useProducts } from "@/hooks/useProducts";
+import { useSiteConfig } from "@/hooks/useSiteConfig";
 import heroImage from "@/assets/hero-main.jpg";
 import beforeAfterImage from "@/assets/before-after.jpg";
 import lucasAvatar from "@/assets/avatars/lucas.png";
@@ -36,6 +37,7 @@ const testimonials = [
 
 const Index = () => {
   const { data: dbProducts } = useProducts();
+  const { data: config } = useSiteConfig();
   
   const allProducts = useMemo(() => {
     const fromDb = (dbProducts || []).map((p) => ({
@@ -59,7 +61,7 @@ const Index = () => {
       {/* Hero */}
       <section className="relative min-h-screen flex items-end">
         <div className="absolute inset-0">
-          <img src={heroImage} alt="Quadro QUADRZZ em ambiente moderno" className="w-full h-full object-cover" />
+          <img src={config?.hero_image_url || heroImage} alt="Hero QUADRZZ" className="w-full h-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
         </div>
         <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-8 pb-20 md:pb-32 w-full">
@@ -72,12 +74,12 @@ const Index = () => {
             <motion.h1 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="text-4xl md:text-6xl lg:text-7xl leading-[0.95] drop-shadow-2xl"
+              className="text-4xl md:text-6xl lg:text-7xl leading-[0.95] drop-shadow-2xl uppercase"
             >
-              NÃO DECORE SUA PAREDE. DECLARE QUEM VOCÊ É.
+              {config?.hero_title || "NÃO DECORE SUA PAREDE. DECLARE QUEM VOCÊ É."}
             </motion.h1>
             <p className="mt-6 text-base md:text-lg text-muted-foreground font-body leading-relaxed max-w-lg">
-              Quadros em Alumínio Premium e MDF de alta densidade. Identidade visual para quem não aceita o comum.
+              {config?.hero_subtitle || "Quadros em Alumínio Premium e MDF de alta densidade. Identidade visual para quem não aceita o comum."}
             </p>
             <div className="mt-8 flex flex-wrap gap-4">
               <Link to="/colecao">
