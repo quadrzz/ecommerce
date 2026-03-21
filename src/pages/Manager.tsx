@@ -40,6 +40,9 @@ const Manager = () => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
   const [uploading, setUploading] = useState(false);
+  const [showPasswordForm, setShowPasswordForm] = useState(false);
+  const [passwordForm, setPasswordForm] = useState({ current: "", new: "", confirm: "" });
+  const [changingPassword, setChangingPassword] = useState(false);
 
   if (loading) {
     return (
