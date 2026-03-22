@@ -178,7 +178,7 @@ const Index = () => {
               transition={{ delay: i * 0.05, duration: 0.4 }}
               className="space-y-3">
               
-                <b.icon size={24} strokeWidth={1} className="text-accent text-center" />
+                <b.icon size={24} strokeWidth={1} className="text-accent" />
                 <h3 className="text-xs tracking-widest">{b.title}</h3>
                 <p className="text-sm text-muted-foreground font-body leading-relaxed">{b.desc}</p>
               </motion.div>
