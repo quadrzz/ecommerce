@@ -29,6 +29,7 @@ export type Database = {
           sizes: string[]
           sort_order: number | null
           updated_at: string
+          yampi_sku_id: string | null
         }
         Insert: {
           category: string
@@ -44,6 +45,7 @@ export type Database = {
           sizes?: string[]
           sort_order?: number | null
           updated_at?: string
+          yampi_sku_id?: string | null
         }
         Update: {
           category?: string
@@ -59,6 +61,7 @@ export type Database = {
           sizes?: string[]
           sort_order?: number | null
           updated_at?: string
+          yampi_sku_id?: string | null
         }
         Relationships: []
       }

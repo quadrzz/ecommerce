@@ -1,0 +1,1 @@
+ALTER TABLE public.products ADD COLUMN yampi_sku_id text DEFAULT NULL;

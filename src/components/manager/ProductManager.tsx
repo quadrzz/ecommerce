@@ -24,6 +24,7 @@ const emptyForm = {
   materials: defaultMaterials,
   image_url: "",
   is_active: true,
+  yampi_sku_id: "",
 };
 
 export const ProductManager = () => {
@@ -88,6 +89,7 @@ export const ProductManager = () => {
       materials: p.materials,
       image_url: p.image_url || "",
       is_active: p.is_active ?? true,
+      yampi_sku_id: p.yampi_sku_id || "",
     });
     setEditingId(p.id);
     setShowForm(true);
@@ -236,6 +238,16 @@ export const ProductManager = () => {
                   ))}
                 </div>
               </div>
+            </div>
+
+            <div>
+              <label className="text-xs font-display tracking-widest mb-2 block">SKU YAMPI</label>
+              <input
+                value={form.yampi_sku_id}
+                onChange={(e) => setForm((f) => ({ ...f, yampi_sku_id: e.target.value }))}
+                className="w-full bg-background border border-border text-foreground font-body text-sm p-3 focus:outline-none focus:border-foreground/40 transition-colors"
+                placeholder="ID do SKU na Yampi (obrigatório para checkout)"
+              />
             </div>
 
             <div className="flex items-center gap-3">

@@ -94,7 +94,7 @@ const Header = () => {
                 <Link
                   key={link.path}
                   to={link.path}
-                  onClick={() => setMenuOpen(false)}
+                  onClick={() => setIsMobileMenuOpen(false)}
                   className="text-sm font-display tracking-widest text-muted-foreground hover:text-foreground transition-colors"
                 >
                   {link.label}
