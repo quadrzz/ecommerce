@@ -23,7 +23,7 @@ export const useSiteConfig = () => {
       if (error && error.code !== "PGRST116") { // Ignore zero rows error
         throw error;
       }
-      return data as SiteConfig | null;
+      return data as unknown as SiteConfig | null;
     },
   });
 };
