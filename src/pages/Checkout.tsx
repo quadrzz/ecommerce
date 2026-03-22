@@ -37,12 +37,14 @@ const Checkout = () => {
         .insert({
           customer_name: formData.name,
           customer_email: formData.email,
+          customer_phone: formData.phone,
           total_amount: cartTotal,
           status: "pending",
           payment_method: "mercadopago"
         })
         .select()
         .single() as any);
+
 
       if (orderError) throw orderError;
 
