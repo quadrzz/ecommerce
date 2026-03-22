@@ -14,72 +14,104 @@ export type Database = {
   }
   public: {
     Tables: {
-      products: {
+      order_items: {
         Row: {
-          category: string
-          category_slug: string
-          created_at: string
-          description: string | null
+          created_at: string | null
           id: string
           image_url: string | null
-          is_active: boolean | null
-          materials: string[]
-          name: string
-          price: number
-          sizes: string[]
-          sort_order: number | null
-          updated_at: string
-          yampi_sku_id: string | null
+          order_id: string | null
+          product_id: string | null
+          product_name: string
+          quantity: number
+          unit_price: number
         }
         Insert: {
-          category: string
-          category_slug: string
-          created_at?: string
-          description?: string | null
+          created_at?: string | null
           id?: string
           image_url?: string | null
-          is_active?: boolean | null
-          materials?: string[]
-          name: string
-          price: number
-          sizes?: string[]
-          sort_order?: number | null
-          updated_at?: string
-          yampi_sku_id?: string | null
+          order_id?: string | null
+          product_id?: string | null
+          product_name: string
+          quantity: number
+          unit_price: number
         }
         Update: {
-          category?: string
-          category_slug?: string
-          created_at?: string
-          description?: string | null
+          created_at?: string | null
           id?: string
           image_url?: string | null
-          is_active?: boolean | null
-          materials?: string[]
-          name?: string
-          price?: number
-          sizes?: string[]
-          sort_order?: number | null
-          updated_at?: string
-          yampi_sku_id?: string | null
+          order_id?: string | null
+          product_id?: string | null
+          product_name?: string
+          quantity?: number
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      orders: {
+        Row: {
+          created_at: string | null
+          customer_email: string
+          customer_name: string | null
+          id: string
+          payment_id: string | null
+          payment_method: string | null
+          status: Database["public"]["Enums"]["order_status"] | null
+          total_amount: number
+        }
+        Insert: {
+          created_at?: string | null
+          customer_email: string
+          customer_name?: string | null
+          id?: string
+          payment_id?: string | null
+          payment_method?: string | null
+          status?: Database["public"]["Enums"]["order_status"] | null
+          total_amount: number
+        }
+        Update: {
+          created_at?: string | null
+          customer_email?: string
+          customer_name?: string | null
+          id?: string
+          payment_id?: string | null
+          payment_method?: string | null
+          status?: Database["public"]["Enums"]["order_status"] | null
+          total_amount?: number
         }
         Relationships: []
       }
-      user_roles: {
+      site_config: {
         Row: {
-          id: string
-          role: Database["public"]["Enums"]["app_role"]
-          user_id: string
+          hero_image_url: string | null
+          hero_subtitle: string | null
+          hero_title: string | null
+          id: number
+          logo_url: string | null
+          updated_at: string | null
         }
         Insert: {
-          id?: string
-          role: Database["public"]["Enums"]["app_role"]
-          user_id: string
+          hero_image_url?: string | null
+          hero_subtitle?: string | null
+          hero_title?: string | null
+          id?: number
+          logo_url?: string | null
+          updated_at?: string | null
         }
         Update: {
-          id?: string
-          role?: Database["public"]["Enums"]["app_role"]
-          user_id?: string
+          hero_image_url?: string | null
+          hero_subtitle?: string | null
+          hero_title?: string | null
+          id?: number
+          logo_url?: string | null
+          updated_at?: string | null
         }
         Relationships: []
       }
@@ -88,16 +120,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      has_role: {
-        Args: {
-          _role: Database["public"]["Enums"]["app_role"]
-          _user_id: string
-        }
-        Returns: boolean
-      }
+      [_ in never]: never
     }
     Enums: {
-      app_role: "admin" | "user"
+      order_status: "pending" | "paid" | "failed" | "cancelled"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -225,7 +251,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "user"],
+      order_status: ["pending", "paid", "failed", "cancelled"],
     },
   },
 } as const
