@@ -67,6 +67,7 @@ const ProductDetail = () => {
       size: product.sizes[selectedSize],
       material: product.materials[selectedMaterial],
       quantity: 1,
+      yampiSkuId: (product as any).yampiSkuId,
     });
     setIsCartOpen(true);
   };
