@@ -11,15 +11,20 @@ import {
   PanelRightClose, 
   Menu,
   KeyRound,
+  ShoppingBag,
   X
 } from "lucide-react";
+
 import { DashboardTab } from "@/components/manager/DashboardTab";
 import { ProductManager } from "@/components/manager/ProductManager";
+import { OrdersTab } from "@/components/manager/OrdersTab";
 import { SiteSettings } from "@/components/manager/SiteSettings";
+
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
-type Tab = "dashboard" | "products" | "settings";
+type Tab = "dashboard" | "orders" | "products" | "settings";
+
 
 const Manager = () => {
   const { user, isAdmin, loading, signOut } = useAuth();
@@ -77,7 +82,9 @@ const Manager = () => {
   const renderTab = () => {
     switch (activeTab) {
       case "dashboard": return <DashboardTab />;
+      case "orders": return <OrdersTab />;
       case "products": return <ProductManager />;
+
       case "settings": return <SiteSettings />;
       default: return <DashboardTab />;
     }
@@ -113,6 +120,15 @@ const Manager = () => {
           >
             <LayoutDashboard size={16} /> DASHBOARD
           </button>
+          <button
+            onClick={() => { setActiveTab("orders"); setMobileMenuOpen(false); }}
+            className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-display tracking-widest transition-colors
+              ${activeTab === "orders" ? "bg-foreground text-background" : "hover:bg-accent/10"}`}
+          >
+            <ShoppingBag size={16} /> PEDIDOS
+          </button>
+
+
           <button
             onClick={() => { setActiveTab("products"); setMobileMenuOpen(false); }}
             className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-display tracking-widest transition-colors
