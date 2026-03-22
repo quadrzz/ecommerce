@@ -89,6 +89,7 @@ export const ProductManager = () => {
       materials: p.materials,
       image_url: p.image_url || "",
       is_active: p.is_active ?? true,
+      yampi_sku_id: p.yampi_sku_id || "",
     });
     setEditingId(p.id);
     setShowForm(true);
