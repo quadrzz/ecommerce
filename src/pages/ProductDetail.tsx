@@ -35,8 +35,8 @@ const ProductDetail = () => {
         description: dbProduct.description || "",
         sizes: dbProduct.sizes,
         materials: dbProduct.materials,
-        yampiSkuId: dbProduct.yampi_sku_id || undefined,
       }
+
     : null;
 
   if (isLoading && !staticProduct) {
@@ -67,8 +67,8 @@ const ProductDetail = () => {
       size: product.sizes[selectedSize],
       material: product.materials[selectedMaterial],
       quantity: 1,
-      yampiSkuId: (product as any).yampiSkuId,
     });
+
     setIsCartOpen(true);
   };
 
@@ -81,8 +81,8 @@ const ProductDetail = () => {
       size: product.sizes[selectedSize],
       material: product.materials[selectedMaterial],
       quantity: 1,
-      yampiSkuId: (product as any).yampiSkuId,
     });
+
     navigate("/checkout");
   };
 

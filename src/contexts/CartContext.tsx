@@ -9,8 +9,8 @@ export interface CartItem {
   size: string;
   material: string;
   quantity: number;
-  yampiSkuId?: string;
 }
+
 
 interface CartContextData {
   items: CartItem[];

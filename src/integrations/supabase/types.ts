@@ -88,7 +88,56 @@ export type Database = {
         }
         Relationships: []
       }
+      products: {
+        Row: {
+          category: string
+          category_slug: string
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string | null
+          is_active: boolean | null
+          materials: string[]
+          name: string
+          price: number
+          sizes: string[]
+          sort_order: number | null
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          category_slug: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          materials: string[]
+          name: string
+          price: number
+          sizes: string[]
+          sort_order?: number | null
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          category_slug?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          materials?: string[]
+          name?: string
+          price?: number
+          sizes?: string[]
+          sort_order?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       site_config: {
+
         Row: {
           hero_image_url: string | null
           hero_subtitle: string | null

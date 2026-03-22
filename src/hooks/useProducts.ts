@@ -13,10 +13,10 @@ export type DbProduct = {
   image_url: string | null;
   sort_order: number | null;
   is_active: boolean | null;
-  yampi_sku_id: string | null;
   created_at: string;
   updated_at: string;
 };
+
 
 export function useProducts() {
   return useQuery({
