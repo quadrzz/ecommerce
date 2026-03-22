@@ -24,6 +24,7 @@ const emptyForm = {
   materials: defaultMaterials,
   image_url: "",
   is_active: true,
+  yampi_sku_id: "",
 };
 
 export const ProductManager = () => {
