@@ -35,6 +35,7 @@ const ProductDetail = () => {
         description: dbProduct.description || "",
         sizes: dbProduct.sizes,
         materials: dbProduct.materials,
+        yampiSkuId: dbProduct.yampi_sku_id || undefined,
       }
     : null;
 
