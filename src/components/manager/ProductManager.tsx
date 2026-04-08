@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useProducts, useCreateProduct, useUpdateProduct, useDeleteProduct, uploadProductImage, type DbProduct } from "@/hooks/useProducts";
 import { Button } from "@/components/ui/button";
-import { Pencil, Trash2, Plus, Image, X } from "lucide-react";
+import { Pencil, Trash2, Plus, Image, X, Upload, Download, Link } from "lucide-react";
 import { toast } from "sonner";
 
 const defaultSizes = ["30x40cm", "40x60cm", "60x90cm", "80x120cm"];
@@ -37,6 +37,8 @@ export const ProductManager = () => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
   const [uploading, setUploading] = useState(false);
+  const [showImport, setShowImport] = useState(false);
+  const [importData, setImportData] = useState("");
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -130,18 +132,85 @@ export const ProductManager = () => {
           <h2 className="text-2xl font-display">Produtos</h2>
           <p className="text-muted-foreground font-body text-sm">Gerencie seu catálogo, estoque e descrições.</p>
         </div>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => {
-            setForm(emptyForm);
-            setEditingId(null);
-            setShowForm(true);
-          }}
-        >
-          <Plus size={14} className="mr-2" /> NOVO PRODUTO
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={() => setShowImport(true)}>
+            <Download size={14} className="mr-2" /> IMPORTAR
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => {
+            const data = JSON.stringify(products, null, 2);
+            const blob = new Blob([data], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "produtos.json";
+            a.click();
+          }}>
+            <Upload size={14} className="mr-2" /> EXPORTAR
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              setForm(emptyForm);
+              setEditingId(null);
+              setShowForm(true);
+            }}
+          >
+            <Plus size={14} className="mr-2" /> NOVO PRODUTO
+          </Button>
+        </div>
       </div>
+
+      {showImport && (
+        <div className="bg-secondary border border-border p-6 md:p-8 space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-display tracking-widest">IMPORTAR PRODUTOS (JSON)</h2>
+            <button onClick={() => { setShowImport(false); setImportData(""); }}>
+              <X size={18} className="text-muted-foreground hover:text-foreground transition-colors" />
+            </button>
+          </div>
+          <p className="text-xs text-muted-foreground font-body">
+            Cole o JSON exportado da Yampi ou de outro sistema. O formato deve ser um array de objetos com: name, price, category, image_url, sizes, materials.
+          </p>
+          <textarea
+            value={importData}
+            onChange={(e) => setImportData(e.target.value)}
+            className="w-full h-48 bg-background border border-border text-foreground font-body text-sm p-3 resize-none focus:outline-none focus:border-foreground/40 font-mono text-xs"
+            placeholder='[{"name": "Produto 1", "price": 99.90, "category": "Carros", "image_url": "https://...", "sizes": ["30x40cm"], "materials": ["Alumínio Premium"]}]'
+          />
+          <Button 
+            variant="metal" 
+            size="lg" 
+            onClick={async () => {
+              try {
+                const parsed = JSON.parse(importData);
+                const items = Array.isArray(parsed) ? parsed : [parsed];
+                for (const item of items) {
+                  await createProduct.mutateAsync({
+                    name: item.name || "Produto sem nome",
+                    price: parseFloat(item.price) || 0,
+                    category: item.category || "Carros",
+                    category_slug: item.category_slug || item.category?.toLowerCase() || "carros",
+                    image_url: item.image_url || "",
+                    description: item.description || "",
+                    sizes: item.sizes || defaultSizes,
+                    materials: item.materials || defaultMaterials,
+                    is_active: item.is_active ?? true,
+                  });
+                }
+                toast.success(`${items.length} produto(s) importado(s)!`);
+                setShowImport(false);
+                setImportData("");
+              } catch (e) {
+                toast.error("JSON inválido. Verifique o formato.");
+              }
+            }}
+            disabled={createProduct.isPending || !importData.trim()}
+          >
+            {createProduct.isPending ? "IMPORTANDO..." : "IMPORTAR"}
+          </Button>
+        </div>
+      )}
 
       {showForm && (
         <div className="bg-secondary border border-border p-6 md:p-8 space-y-6">

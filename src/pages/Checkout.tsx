@@ -6,7 +6,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Shield, Lock, CreditCard, CheckCircle, MapPin } from "lucide-react";
+import { Shield, Lock, CheckCircle, MapPin, Send } from "lucide-react";
+
+const WHATSAPP_NUMBER = "5581991169932";
 
 const applyPhoneMask = (value: string) => {
   const digits = value.replace(/\D/g, "").slice(0, 11);
@@ -113,7 +115,6 @@ const Checkout = () => {
 
     setLoading(true);
     try {
-      // 1. Criar o pedido no Supabase
       const { data: order, error: orderError } = await (supabase
         .from("orders" as any)
         .insert({
@@ -132,14 +133,13 @@ const Checkout = () => {
           coupon_code: coupon?.code || null,
           discount_amount: discount,
           status: "pending",
-          payment_method: "mercadopago"
+          payment_method: "whatsapp"
         })
         .select()
         .single() as any);
 
       if (orderError) throw orderError;
 
-      // 2. Salvar os itens do pedido
       const orderItems = items.map((item) => ({
         order_id: order.id,
         product_name: item.name,
@@ -154,33 +154,32 @@ const Checkout = () => {
 
       if (itemsError) throw itemsError;
 
-      // 3. Chamar a Edge Function para criar a preferência no Mercado Pago
-      const { data: pref, error: prefError } = await supabase.functions.invoke("create-preference", {
-        body: {
-          orderId: order.id,
-          items: items.map((item) => ({
-            name: item.name,
-            quantity: item.quantity,
-            price: item.price,
-          })),
-          customer: {
-            email: formData.email,
-            name: formData.name,
-          }
-        },
-      });
+      const itemsList = items.map(item => 
+        `• ${item.name} (${item.size}, ${item.material}) - Qtd: ${item.quantity} - R$ ${(item.price * item.quantity).toFixed(2)}`
+      ).join('%0A');
 
-      if (prefError) throw prefError;
-      if (pref?.error) throw new Error(pref.error);
+      const message = `*NOVO PEDIDO #${order.id.slice(0, 8)}*%0A%0A` +
+        `*CLIENTE:* ${formData.name}%0A` +
+        `*EMAIL:* ${formData.email}%0A` +
+        `*WHATSAPP:* ${formData.phone}%0A` +
+        `*CPF:* ${formData.document}%0A%0A` +
+        `*ENDEREÇO:*%0A` +
+        `${formData.address}, ${formData.number}${formData.complement ? ', ' + formData.complement : ''}%0A` +
+        `${formData.neighborhood} - ${formData.city}/${formData.state}%0A` +
+        `CEP: ${formData.cep}%0A%0A` +
+        `*ITENS:*%0A${itemsList}%0A%0A` +
+        `*Subtotal:* R$ ${cartTotal.toFixed(2)}%0A` +
+        `${coupon ? `*Desconto (${coupon.code}):* -R$ ${discount.toFixed(2)}%0A` : ''}` +
+        `*TOTAL:* R$ ${finalTotal.toFixed(2)}%0A%0A` +
+        `_Pedido realizado via site_`;
 
-      if (pref?.init_point) {
-        toast.success("Pedido criado! Redirecionando para o pagamento...");
-        setTimeout(() => {
-          window.location.href = pref.init_point;
-        }, 1500);
-      } else {
-        throw new Error("Link de pagamento não gerado.");
-      }
+      const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${message}`;
+      
+      toast.success("Pedido criado! Redirecionando para o WhatsApp...");
+      setTimeout(() => {
+        window.open(whatsappUrl, '_blank');
+        window.location.href = "/pedido-sucesso";
+      }, 1000);
     } catch (error: any) {
       console.error("Erro no checkout:", error);
       toast.error(error.message || "Erro ao processar seu pedido.");
@@ -350,7 +349,7 @@ const Checkout = () => {
               </div>
 
               <p className="text-[10px] text-muted-foreground font-body mt-4">
-                Ao clicar em PAGAR AGORA, você concorda com nossos termos e será redirecionado para o Mercado Pago com segurança.
+                Ao clicar em ENVIAR PEDIDO, você será redirecionado para o WhatsApp para finalizar o pagamento via PIX ou cartão.
               </p>
 
               <Button
@@ -360,7 +359,7 @@ const Checkout = () => {
                 className="w-full mt-6"
                 disabled={loading}
               >
-                {loading ? "PROCESSANDO..." : "PAGAR AGORA"}
+                {loading ? "PROCESSANDO..." : "ENVIAR PEDIDO"}
               </Button>
             </form>
           </div>
@@ -409,15 +408,15 @@ const Checkout = () => {
               </div>
               <div className="flex items-center gap-3 text-muted-foreground">
                 <Lock size={16} className="text-green-600" />
-                <span className="text-xs font-body">Pagamento 100% seguro</span>
+                <span className="text-xs font-body">Pagamento via WhatsApp</span>
               </div>
               <div className="flex items-center gap-3 text-muted-foreground">
                 <CheckCircle size={16} className="text-green-600" />
                 <span className="text-xs font-body">Satisfação garantida ou dinheiro de volta</span>
               </div>
               <div className="flex items-center gap-3 text-muted-foreground">
-                <CreditCard size={16} />
-                <span className="text-xs font-body">Parcele em até 12x no cartão</span>
+                <Send size={16} className="text-green-600" />
+                <span className="text-xs font-body">Pagamento por PIX ou cartão</span>
               </div>
             </div>
           </div>
