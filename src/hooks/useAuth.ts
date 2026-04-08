@@ -6,10 +6,9 @@ export function useAuth() {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setLoading(true);
     let mounted = true;
 
     const checkAdmin = async (userId: string) => {
@@ -32,7 +31,6 @@ export function useAuth() {
       }
     };
 
-    // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
         if (!mounted) return;
@@ -49,7 +47,6 @@ export function useAuth() {
       }
     );
 
-    // Initial session check with timeout
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!mounted) return;
       
@@ -63,25 +60,24 @@ export function useAuth() {
       }
     });
 
-    // Fallback timeout - ensure loading stops after 5 seconds
-    const timeout = setTimeout(() => {
-      if (mounted && loading) {
-        setLoading(false);
-      }
-    }, 5000);
-
     return () => {
       mounted = false;
-      clearTimeout(timeout);
       subscription.unsubscribe();
     };
   }, []);
 
+  const signIn = async (email: string, password: string) => {
+    setLoading(true);
+    const result = await supabase.auth.signInWithPassword({ email, password });
+    return result;
+  };
 
-  const signIn = (email: string, password: string) =>
-    supabase.auth.signInWithPassword({ email, password });
-
-  const signOut = () => supabase.auth.signOut();
+  const signOut = async () => {
+    await supabase.auth.signOut();
+    setUser(null);
+    setSession(null);
+    setIsAdmin(false);
+  };
 
   return { session, user, isAdmin, loading, signIn, signOut };
 }

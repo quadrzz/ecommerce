@@ -4,13 +4,30 @@ import { Navigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
 const AdminLogin = () => {
-  const { user, isAdmin, loading, signIn } = useAuth();
+  const { user, isAdmin, loading: authLoading, signIn } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  if (loading) {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setSubmitting(true);
+    
+    try {
+      const { error: err } = await signIn(email, password);
+      if (err) {
+        setError(err.message === "Invalid login credentials" ? "Email ou senha incorretos." : err.message);
+        setSubmitting(false);
+      }
+    } catch (err: any) {
+      setError(err.message || "Erro ao fazer login.");
+      setSubmitting(false);
+    }
+  };
+
+  if (authLoading && !submitting) {
     return (
       <main className="pt-28 pb-20 flex items-center justify-center min-h-screen">
         <p className="text-muted-foreground font-body">Carregando...</p>
@@ -21,17 +38,6 @@ const AdminLogin = () => {
   if (user && isAdmin) {
     return <Navigate to="/manager" replace />;
   }
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-    setSubmitting(true);
-    const { error: err } = await signIn(email, password);
-    if (err) {
-      setError("Email ou senha incorretos.");
-    }
-    setSubmitting(false);
-  };
 
   return (
     <main className="pt-28 pb-20 flex items-center justify-center min-h-screen">
@@ -46,6 +52,7 @@ const AdminLogin = () => {
               onChange={(e) => setEmail(e.target.value)}
               className="w-full bg-secondary border border-border text-foreground font-body text-sm p-3 focus:outline-none focus:border-foreground/40 transition-colors"
               required
+              disabled={submitting}
             />
           </div>
           <div>
@@ -56,6 +63,7 @@ const AdminLogin = () => {
               onChange={(e) => setPassword(e.target.value)}
               className="w-full bg-secondary border border-border text-foreground font-body text-sm p-3 focus:outline-none focus:border-foreground/40 transition-colors"
               required
+              disabled={submitting}
             />
           </div>
           {error && <p className="text-xs text-destructive font-body">{error}</p>}
