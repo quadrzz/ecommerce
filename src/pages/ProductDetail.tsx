@@ -1,19 +1,18 @@
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Button } from "@/components/ui/button";
 import { products as staticProducts } from "@/data/products";
 import { useProduct } from "@/hooks/useProducts";
-import MobileConversionBar from "@/components/MobileConversionBar";
 import UpsellBundle from "@/components/UpsellBundle";
 import CountdownTimer, { useCountdown } from "@/components/CountdownTimer";
 import SocialProof from "@/components/SocialProof";
-import { Check, Flame } from "lucide-react";
+import { Check, MessageCircle } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
+
+const WHATSAPP_NUMBER = "5581991169932";
 
 const ProductDetail = () => {
   const { id } = useParams();
-  const navigate = useNavigate();
   
   // Try static first
   const staticProduct = staticProducts.find((p) => p.id === id);
@@ -69,7 +68,7 @@ const ProductDetail = () => {
     );
   }
 
-  const { addToCart, setIsCartOpen } = useCart();
+  const { addToCart } = useCart();
 
   const handleAddToCart = () => {
     addToCart({
@@ -81,22 +80,11 @@ const ProductDetail = () => {
       material: product.materials[selectedMaterial],
       quantity: 1,
     });
-
-    setIsCartOpen(true);
   };
 
-  const handleBuyNow = () => {
-    addToCart({
-      productId: product.id,
-      name: product.name,
-      price: hasPromo ? finalPrice : product.price,
-      image: product.image,
-      size: product.sizes[selectedSize],
-      material: product.materials[selectedMaterial],
-      quantity: 1,
-    });
-
-    navigate("/checkout");
+  const handleWhatsApp = () => {
+    const message = `Olá! Gostaria de saber mais sobre o produto:%0A%0A*${product.name}*%0ATamanho: ${product.sizes[selectedSize]}%0AMaterial: ${product.materials[selectedMaterial]}%0APreço: R$ ${(hasPromo ? finalPrice : product.price).toFixed(2)}`;
+    window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${message}`, '_blank');
   };
 
   return (
@@ -141,13 +129,6 @@ const ProductDetail = () => {
               <p className="mt-2 text-2xl font-display tabular-nums">
                 R$ {product.price.toFixed(2).replace(".", ",")}
               </p>
-            )}
-
-            {isLowStock && (
-              <div className="mt-2 flex items-center gap-2 text-red-600">
-                <Flame size={14} />
-                <span className="text-xs font-bold">Apenas {(product as any).stockCount} unidades disponíveis!</span>
-              </div>
             )}
 
             {hasPromo && showTimer && (
@@ -198,12 +179,13 @@ const ProductDetail = () => {
             </div>
 
             <div className="mt-8 hidden md:flex gap-4">
-              <Button variant="outline" size="xl" onClick={handleAddToCart} className="flex-1">
+              <button onClick={handleAddToCart} className="flex-1 py-4 px-6 border border-border text-xs font-display tracking-widest hover:bg-secondary transition-colors">
                 ADICIONAR AO CARRINHO
-              </Button>
-              <Button variant="metal" size="xl" onClick={handleBuyNow} className="flex-1">
-                COMPRAR AGORA
-              </Button>
+              </button>
+              <button onClick={handleWhatsApp} className="flex-1 py-4 px-6 bg-foreground text-background text-xs font-display tracking-widest hover:bg-foreground/90 transition-colors flex items-center justify-center gap-2">
+                <MessageCircle size={16} />
+                FINALIZAR NO WHATSAPP
+              </button>
             </div>
 
             {showUpsell && (
@@ -222,7 +204,6 @@ const ProductDetail = () => {
                       material: product.materials[selectedMaterial],
                       quantity: 2,
                     });
-                    setIsCartOpen(true);
                     setShowUpsell(false);
                   }}
                 />
@@ -266,9 +247,17 @@ const ProductDetail = () => {
             </div>
           </motion.div>
         </div>
-      </div>
 
-      <MobileConversionBar onAddCart={handleAddToCart} onBuy={handleBuyNow} />
+        <div className="md:hidden fixed bottom-0 left-0 right-0 bg-background border-t border-border p-4 flex gap-3 z-50">
+          <button onClick={handleAddToCart} className="flex-1 py-3 px-4 border border-border text-xs font-display tracking-widest hover:bg-secondary transition-colors">
+            CARRINHO
+          </button>
+          <button onClick={handleWhatsApp} className="flex-1 py-3 px-4 bg-foreground text-background text-xs font-display tracking-widest hover:bg-foreground/90 transition-colors flex items-center justify-center gap-2">
+            <MessageCircle size={16} />
+            WHATSAPP
+          </button>
+        </div>
+      </div>
     </main>
   );
 };

@@ -164,26 +164,44 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Benefits */}
+      {/* Real Photos/Videos Section */}
       <section className="py-20 md:py-32">
         <div className="max-w-7xl mx-auto px-4 md:px-8">
-          <h2 className="text-2xl md:text-4xl mb-12">POR QUE QUADRZZ?</h2>
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-8">
-            {benefits.map((b, i) =>
-            <motion.div
-              key={b.title}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.05, duration: 0.4 }}
-              className="space-y-3">
-              
-                <b.icon size={24} strokeWidth={1} className="text-accent" />
-                <h3 className="text-xs tracking-widest">{b.title}</h3>
-                <p className="text-sm text-muted-foreground font-body leading-relaxed">{b.desc}</p>
-              </motion.div>
-            )}
-          </div>
+          <motion.h2
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            className="text-2xl md:text-4xl mb-4 text-center">
+            RESULTADOS REAIS
+          </motion.h2>
+          <p className="text-muted-foreground font-body text-center max-w-md mx-auto mb-12">
+            Veja como ficam os quadros na parede. Fotos e vídeos reais dos nossos clientes.
+          </p>
+          <Carousel
+            opts={{
+              align: "start",
+              loop: true
+            }}
+            className="w-full max-w-4xl mx-auto">
+            <CarouselContent className="-ml-2 md:-ml-4">
+              {[
+                { type: "image", src: "https://images.unsplash.com/photo-1513519245088-0e12902e5a38?w=600&h=800&fit=crop", alt: "Quadro na sala" },
+                { type: "image", src: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=600&h=800&fit=crop", alt: "Quadro no quarto" },
+                { type: "image", src: "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=600&h=800&fit=crop", alt: "Quadro moderno" },
+                { type: "image", src: "https://images.unsplash.com/photo-1615529182904-14819c35db37?w=600&h=800&fit=crop", alt: "Decoração QUADRZZ" },
+                { type: "image", src: "https://images.unsplash.com/photo-1494438639946-1ebd1d20bf85?w=600&h=800&fit=crop", alt: "Sala de estar" },
+                { type: "image", src: "https://images.unsplash.com/photo-1513694203232-719a280e022f?w=600&h=800&fit=crop", alt: "Quadro decorativo" },
+              ].map((item, i) => (
+                <CarouselItem key={i} className="pl-2 md:pl-4 basis-full md:basis-1/2">
+                  <div className="aspect-[3/4] bg-secondary overflow-hidden metal-border">
+                    <img src={item.src} alt={item.alt} className="w-full h-full object-cover" loading="lazy" />
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <CarouselPrevious className="absolute -left-12 top-1/2 -translate-y-1/2 border-border/50 hover:bg-background hidden md:flex" />
+            <CarouselNext className="absolute -right-12 top-1/2 -translate-y-1/2 border-border/50 hover:bg-background hidden md:flex" />
+          </Carousel>
         </div>
       </section>
 
