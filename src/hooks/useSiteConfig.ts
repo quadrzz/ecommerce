@@ -53,23 +53,40 @@ export const uploadSiteAsset = async (file: File, folder: string): Promise<strin
   const fileExt = file.name.split(".").pop();
   const fileName = `${folder}-${Date.now()}.${fileExt}`;
 
-  console.log("Uploading to bucket: site-assets, file:", fileName);
+  try {
+    const { data: buckets } = await supabase.storage.listBuckets();
+    const bucketExists = buckets?.some(b => b.id === 'site-assets');
+    
+    if (!bucketExists) {
+      const { error: bucketError } = await supabase.storage.createBucket('site-assets', {
+        public: true,
+        fileSizeLimit: 5242880,
+      });
+      if (bucketError && bucketError.message !== 'Bucket already exists') {
+        console.error("Bucket creation error:", bucketError);
+        throw new Error("Não foi criar o bucket de armazenamento");
+      }
+    }
 
-  const { error } = await supabase.storage
-    .from("site-assets")
-    .upload(fileName, file, {
-      cacheControl: "3600",
-      upsert: true,
-    });
+    const { error } = await supabase.storage
+      .from("site-assets")
+      .upload(fileName, file, {
+        cacheControl: "3600",
+        upsert: true,
+      });
 
-  if (error) {
-    console.error("Upload error details:", error);
-    throw new Error(error.message);
+    if (error) {
+      console.error("Upload error:", error);
+      throw new Error(error.message);
+    }
+
+    const { data } = supabase.storage
+      .from("site-assets")
+      .getPublicUrl(fileName);
+
+    return data.publicUrl;
+  } catch (err: any) {
+    console.error("Upload error:", err);
+    throw new Error(err.message || "Erro ao enviar imagem");
   }
-
-  const { data } = supabase.storage
-    .from("site-assets")
-    .getPublicUrl(fileName);
-
-  return data.publicUrl;
 };
