@@ -50,8 +50,10 @@ export const useUpdateSiteConfig = () => {
 };
 
 export const uploadSiteAsset = async (file: File, folder: string): Promise<string> => {
-  const fileExt = file.name.split(".");
+  const fileExt = file.name.split(".").pop();
   const fileName = `${folder}-${Date.now()}.${fileExt}`;
+
+  console.log("Uploading to bucket: site-assets, file:", fileName);
 
   const { error } = await supabase.storage
     .from("site-assets")
@@ -61,8 +63,8 @@ export const uploadSiteAsset = async (file: File, folder: string): Promise<strin
     });
 
   if (error) {
-    console.error("Upload error:", error);
-    throw error;
+    console.error("Upload error details:", error);
+    throw new Error(error.message);
   }
 
   const { data } = supabase.storage
