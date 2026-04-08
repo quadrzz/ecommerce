@@ -49,18 +49,15 @@ export const useUpdateSiteConfig = () => {
   });
 };
 
-export const uploadSiteAsset = async (file: File, path: string): Promise<string> => {
-  const fileExt = file.name.split(".").pop();
-  const fileName = `${path}-${Math.random()}.${fileExt}`;
-  
-  // We use customer-uploads bucket for simplicity 
-  // or maybe another bucket "assets" if created.
-  // We'll reuse customer-uploads to keep storage simple.
+export const uploadSiteAsset = async (file: File, folder: string): Promise<string> => {
+  const fileExt = file.name.split(".");
+  const fileName = `${folder}-${Date.now()}.${fileExt}`;
+
   const { error } = await supabase.storage
-    .from("customer-uploads")
-    .upload(`assets/${fileName}`, file, {
+    .from("site-assets")
+    .upload(fileName, file, {
       cacheControl: "3600",
-      upsert: false,
+      upsert: true,
     });
 
   if (error) {
@@ -69,8 +66,8 @@ export const uploadSiteAsset = async (file: File, path: string): Promise<string>
   }
 
   const { data } = supabase.storage
-    .from("customer-uploads")
-    .getPublicUrl(`assets/${fileName}`);
-    
+    .from("site-assets")
+    .getPublicUrl(fileName);
+
   return data.publicUrl;
 };

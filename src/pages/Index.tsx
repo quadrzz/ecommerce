@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import ProductCard from "@/components/ProductCard";
-import RealProjectsSection from "@/components/RealProjectsSection";
 import { products, categories } from "@/data/products";
 import { useProducts } from "@/hooks/useProducts";
 import { useSiteConfig } from "@/hooks/useSiteConfig";
@@ -12,6 +11,7 @@ import beforeAfterImage from "@/assets/before-after.jpg";
 import lucasAvatar from "@/assets/avatars/lucas.png";
 import camilaAvatar from "@/assets/avatars/camila.png";
 import pedroAvatar from "@/assets/avatars/pedro.png";
+import producaoVideo from "@/components/manager/produção.mp4";
 import { Printer, Shield, Paintbrush, Package, MessageCircle, BadgeCheck } from "lucide-react";
 import {
   Carousel,
@@ -187,6 +187,55 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Bastidores */}
+      <section className="py-20 md:py-32">
+        <div className="max-w-7xl mx-auto px-4 md:px-8">
+          <motion.h2
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            className="text-2xl md:text-4xl mb-12">
+            BASTIDORES
+          </motion.h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+              className="space-y-6">
+              <h3 className="text-xl md:text-2xl font-display tracking-wider">
+                DO PROJETO À SUA PAREDE
+              </h3>
+              <p className="text-muted-foreground font-body leading-relaxed">
+                Cada quadro QUADRZZ nasce no nosso ateliê com material selecionado a rigor: alumínio de alta liga e MDF de alta densidade, cortados com precisão CNC.
+              </p>
+              <p className="text-muted-foreground font-body leading-relaxed">
+                A impressão UV direta garante resolução extrema — detalhes que não desbotam, não descascam e não perdem a vivacidade com o tempo. O acabamento é lixado, revisado quadro a quadro e enviado em embalagem desenvolvida para chegar perfeito.
+              </p>
+              <p className="text-muted-foreground font-body leading-relaxed">
+                Sem intermediários. Sem atalhos. Do ateliê direto para a sua parede.
+              </p>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+              className="overflow-hidden metal-border bg-secondary aspect-[9/16] md:aspect-[3/4] lg:aspect-[9/16] rounded">
+              <video
+                src={producaoVideo}
+                autoPlay
+                muted
+                loop
+                playsInline
+                className="w-full h-full object-cover"
+              />
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
       {/* Before & After */}
       <section className="py-20 md:py-32 bg-secondary">
         <div className="max-w-7xl mx-auto px-4 md:px-8">
@@ -242,9 +291,6 @@ const Index = () => {
           </div>
         </div>
       </section>
-
-      {/* Real Projects */}
-      <RealProjectsSection />
 
       {/* Final CTA */}
       <section className="py-20 md:py-32 bg-secondary">

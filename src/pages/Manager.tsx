@@ -12,18 +12,20 @@ import {
   Menu,
   KeyRound,
   ShoppingBag,
-  X
+  X,
+  Megaphone
 } from "lucide-react";
 
 import { DashboardTab } from "@/components/manager/DashboardTab";
 import { ProductManager } from "@/components/manager/ProductManager";
 import { OrdersTab } from "@/components/manager/OrdersTab";
 import { SiteSettings } from "@/components/manager/SiteSettings";
+import { MarketingSettings } from "@/components/manager/MarketingSettings";
 
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
-type Tab = "dashboard" | "orders" | "products" | "settings";
+type Tab = "dashboard" | "orders" | "products" | "settings" | "marketing";
 
 
 const Manager = () => {
@@ -81,10 +83,10 @@ const Manager = () => {
 
   const renderTab = () => {
     switch (activeTab) {
-      case "dashboard": return <DashboardTab />;
+      case "dashboard": return <DashboardTab onNavigate={(tab) => setActiveTab(tab as Tab)} />;
       case "orders": return <OrdersTab />;
       case "products": return <ProductManager />;
-
+      case "marketing": return <MarketingSettings />;
       case "settings": return <SiteSettings />;
       default: return <DashboardTab />;
     }
@@ -137,11 +139,18 @@ const Manager = () => {
             <Package size={16} /> PRODUTOS
           </button>
           <button
+            onClick={() => { setActiveTab("marketing"); setMobileMenuOpen(false); }}
+            className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-display tracking-widest transition-colors
+              ${activeTab === "marketing" ? "bg-foreground text-background" : "hover:bg-accent/10"}`}
+          >
+            <Megaphone size={16} /> MARKETING
+          </button>
+          <button
             onClick={() => { setActiveTab("settings"); setMobileMenuOpen(false); }}
             className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-display tracking-widest transition-colors
               ${activeTab === "settings" ? "bg-foreground text-background" : "hover:bg-accent/10"}`}
           >
-            <Settings size={16} /> SETUP DO SITE
+            <Settings size={16} /> CONFIGURAÇÕES
           </button>
         </nav>
 

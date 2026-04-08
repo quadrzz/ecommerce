@@ -14,6 +14,9 @@ export interface Product {
   description: string;
   sizes: string[];
   materials: string[];
+  isPromo?: boolean;
+  promoDiscount?: number;
+  stockCount?: number;
 }
 
 export const products: Product[] = [
@@ -27,6 +30,9 @@ export const products: Product[] = [
     description: "Perfil lateral icônico do Porsche 911 GT3 RS em fotografia P&B de alta definição. Presença absoluta na parede.",
     sizes: ["30x40cm", "40x60cm", "60x90cm", "80x120cm"],
     materials: ["Alumínio Premium", "MDF Alta Densidade"],
+    isPromo: true,
+    promoDiscount: 15,
+    stockCount: 3,
   },
   {
     id: "hustle-typography",

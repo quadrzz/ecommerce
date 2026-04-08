@@ -1,30 +1,112 @@
 import { useState } from "react";
 import { useCart } from "@/contexts/CartContext";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Shield, Lock, CreditCard, CheckCircle, MapPin } from "lucide-react";
+
+const applyPhoneMask = (value: string) => {
+  const digits = value.replace(/\D/g, "").slice(0, 11);
+  if (digits.length <= 2) return `(${digits}`;
+  if (digits.length <= 7) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
+  return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
+};
+
+const applyCpfMask = (value: string) => {
+  const digits = value.replace(/\D/g, "").slice(0, 11);
+  if (digits.length <= 3) return digits;
+  if (digits.length <= 6) return `${digits.slice(0, 3)}.${digits.slice(3)}`;
+  if (digits.length <= 9) return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6)}`;
+  return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6, 9)}-${digits.slice(9)}`;
+};
+
+const applyCnpjMask = (value: string) => {
+  const digits = value.replace(/\D/g, "").slice(0, 14);
+  if (digits.length <= 2) return digits;
+  if (digits.length <= 5) return `${digits.slice(0, 2)}.${digits.slice(2)}`;
+  if (digits.length <= 8) return `${digits.slice(0, 2)}.${digits.slice(2, 5)}.${digits.slice(5)}`;
+  if (digits.length <= 12) return `${digits.slice(0, 2)}.${digits.slice(2, 5)}.${digits.slice(5, 8)}/${digits.slice(8)}`;
+  return `${digits.slice(0, 2)}.${digits.slice(2, 5)}.${digits.slice(5, 8)}/${digits.slice(8, 12)}-${digits.slice(12)}`;
+};
+
+const applyCepMask = (value: string) => {
+  const digits = value.replace(/\D/g, "").slice(0, 8);
+  if (digits.length <= 5) return digits;
+  return `${digits.slice(0, 5)}-${digits.slice(5)}`;
+};
 
 const Checkout = () => {
-  const { items, cartTotal, clearCart } = useCart();
+  const { items, cartTotal, coupon, discount } = useCart();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     phone: "",
+    document: "",
+    documentType: "cpf" as "cpf" | "cnpj",
+    cep: "",
+    address: "",
+    number: "",
+    complement: "",
+    neighborhood: "",
+    city: "",
+    state: "",
   });
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { id, value } = e.target;
+  const handleInputChange = (id: string, value: string) => {
     setFormData((prev) => ({ ...prev, [id]: value }));
   };
 
+  const handleCepLookup = async (cep: string) => {
+    const digits = cep.replace(/\D/g, "");
+    if (digits.length !== 8) return;
+
+    try {
+      const response = await fetch(`https://viacep.com.br/ws/${digits}/json/`);
+      const data = await response.json();
+
+      if (!data.erro) {
+        setFormData((prev) => ({
+          ...prev,
+          address: data.logradouro || "",
+          neighborhood: data.bairro || "",
+          city: data.localidade || "",
+          state: data.uf || "",
+        }));
+      }
+    } catch {
+      // CEP lookup failed silently
+    }
+  };
+
+  const handleCepChange = (value: string) => {
+    const formatted = applyCepMask(value);
+    handleInputChange("cep", formatted);
+
+    if (formatted.replace(/\D/g, "").length === 8) {
+      handleCepLookup(formatted);
+    }
+  };
+
+  const handleDocumentChange = (value: string) => {
+    const digits = value.replace(/\D/g, "");
+    const type = digits.length > 11 ? "cnpj" : "cpf";
+    const formatted = type === "cnpj" ? applyCnpjMask(value) : applyCpfMask(value);
+    handleInputChange("document", formatted);
+    setFormData((prev) => ({ ...prev, documentType: type as "cpf" | "cnpj" }));
+  };
+
+  const finalTotal = cartTotal - discount;
+
   const handlePayment = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!formData.name || !formData.email || !formData.phone) {
+
+    const requiredFields = ["name", "email", "phone", "document", "cep", "address", "neighborhood", "city", "state", "number"];
+    const emptyField = requiredFields.find(f => !formData[f as keyof typeof formData]);
+    if (emptyField) {
       toast.error("Por favor, preencha todos os campos.");
       return;
     }
@@ -38,13 +120,22 @@ const Checkout = () => {
           customer_name: formData.name,
           customer_email: formData.email,
           customer_phone: formData.phone,
-          total_amount: cartTotal,
+          customer_cpf: formData.document,
+          zip_code: formData.cep,
+          address: formData.address,
+          address_number: formData.number,
+          address_complement: formData.complement,
+          address_neighborhood: formData.neighborhood,
+          address_city: formData.city,
+          address_state: formData.state,
+          total_amount: finalTotal,
+          coupon_code: coupon?.code || null,
+          discount_amount: discount,
           status: "pending",
           payment_method: "mercadopago"
         })
         .select()
         .single() as any);
-
 
       if (orderError) throw orderError;
 
@@ -84,7 +175,6 @@ const Checkout = () => {
 
       if (pref?.init_point) {
         toast.success("Pedido criado! Redirecionando para o pagamento...");
-        // Pequeno delay para o toast aparecer
         setTimeout(() => {
           window.location.href = pref.init_point;
         }, 1500);
@@ -123,37 +213,140 @@ const Checkout = () => {
             <form onSubmit={handlePayment} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="name" className="font-display text-xs tracking-widest">NOME COMPLETO</Label>
-                <Input 
-                  id="name" 
-                  placeholder="Seu nome" 
+                <Input
+                  id="name"
+                  placeholder="Seu nome completo"
                   className="bg-background"
                   value={formData.name}
-                  onChange={handleInputChange}
+                  onChange={(e) => handleInputChange("name", e.target.value)}
                   required
                 />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="email" className="font-display text-xs tracking-widest">E-MAIL</Label>
-                <Input 
-                  id="email" 
-                  type="email" 
-                  placeholder="seu@email.com" 
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="seu@email.com"
                   className="bg-background"
                   value={formData.email}
-                  onChange={handleInputChange}
+                  onChange={(e) => handleInputChange("email", e.target.value)}
                   required
                 />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="phone" className="font-display text-xs tracking-widest">WHATSAPP / CELULAR</Label>
-                <Input 
-                  id="phone" 
-                  placeholder="(00) 00000-0000" 
+                <Input
+                  id="phone"
+                  placeholder="(00) 00000-0000"
                   className="bg-background"
                   value={formData.phone}
-                  onChange={handleInputChange}
+                  onChange={(e) => handleInputChange("phone", applyPhoneMask(e.target.value))}
+                  maxLength={15}
                   required
                 />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="document" className="font-display text-xs tracking-widest">CPF OU CNPJ</Label>
+                <Input
+                  id="document"
+                  placeholder={formData.documentType === "cpf" ? "000.000.000-00" : "00.000.000/0000-00"}
+                  className="bg-background"
+                  value={formData.document}
+                  onChange={(e) => handleDocumentChange(e.target.value)}
+                  maxLength={formData.documentType === "cpf" ? 14 : 18}
+                  required
+                />
+              </div>
+
+              <div className="pt-4">
+                <h3 className="text-lg font-display tracking-widest flex items-center gap-2 mb-4">
+                  <MapPin size={18} /> ENDEREÇO
+                </h3>
+                <div className="space-y-3">
+                  <div className="space-y-2">
+                    <Label htmlFor="cep" className="font-display text-xs tracking-widest">CEP</Label>
+                    <Input
+                      id="cep"
+                      placeholder="00000-000"
+                      className="bg-background"
+                      value={formData.cep}
+                      onChange={(e) => handleCepChange(e.target.value)}
+                      maxLength={9}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="address" className="font-display text-xs tracking-widest">RUA / AVENIDA</Label>
+                    <Input
+                      id="address"
+                      placeholder="Nome da rua..."
+                      className="bg-background"
+                      value={formData.address}
+                      onChange={(e) => handleInputChange("address", e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-2">
+                      <Label htmlFor="number" className="font-display text-xs tracking-widest">NÚMERO</Label>
+                      <Input
+                        id="number"
+                        placeholder="123"
+                        className="bg-background"
+                        value={formData.number}
+                        onChange={(e) => handleInputChange("number", e.target.value)}
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="complement" className="font-display text-xs tracking-widest">COMPLEMENTO</Label>
+                      <Input
+                        id="complement"
+                        placeholder="Apto, Sala..."
+                        className="bg-background"
+                        value={formData.complement}
+                        onChange={(e) => handleInputChange("complement", e.target.value)}
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="neighborhood" className="font-display text-xs tracking-widest">BAIRRO</Label>
+                    <Input
+                      id="neighborhood"
+                      placeholder="Nome do bairro"
+                      className="bg-background"
+                      value={formData.neighborhood}
+                      onChange={(e) => handleInputChange("neighborhood", e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-2">
+                      <Label htmlFor="city" className="font-display text-xs tracking-widest">CIDADE</Label>
+                      <Input
+                        id="city"
+                        placeholder="Sua cidade"
+                        className="bg-background"
+                        value={formData.city}
+                        onChange={(e) => handleInputChange("city", e.target.value)}
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="state" className="font-display text-xs tracking-widest">UF</Label>
+                      <Input
+                        id="state"
+                        placeholder="UF"
+                        className="bg-background"
+                        value={formData.state}
+                        onChange={(e) => handleInputChange("state", e.target.value.toUpperCase().slice(0, 2))}
+                        maxLength={2}
+                        required
+                      />
+                    </div>
+                  </div>
+                </div>
               </div>
 
               <p className="text-[10px] text-muted-foreground font-body mt-4">
@@ -196,9 +389,36 @@ const Checkout = () => {
               ))}
             </div>
 
-            <div className="mt-8 pt-6 border-t border-border flex justify-between items-center">
+            {coupon && (
+              <div className="mt-4 py-3 border-t border-border flex justify-between items-center text-green-600">
+                <span className="text-xs font-display">Desconto ({coupon.code})</span>
+                <span className="text-sm font-display">-R$ {discount.toFixed(2).replace(".", ",")}</span>
+              </div>
+            )}
+
+            <div className="mt-4 pt-6 border-t border-border flex justify-between items-center">
               <p className="font-display tracking-widest text-xs">TOTAL A PAGAR</p>
-              <p className="font-display text-2xl">R$ {cartTotal.toFixed(2).replace(".", ",")}</p>
+              <p className="font-display text-2xl">R$ {(cartTotal - discount).toFixed(2).replace(".", ",")}</p>
+            </div>
+
+            {/* Trust Badges */}
+            <div className="mt-8 pt-6 border-t border-border space-y-3">
+              <div className="flex items-center gap-3 text-muted-foreground">
+                <Shield size={16} className="text-green-600" />
+                <span className="text-xs font-body">30 dias de garantia</span>
+              </div>
+              <div className="flex items-center gap-3 text-muted-foreground">
+                <Lock size={16} className="text-green-600" />
+                <span className="text-xs font-body">Pagamento 100% seguro</span>
+              </div>
+              <div className="flex items-center gap-3 text-muted-foreground">
+                <CheckCircle size={16} className="text-green-600" />
+                <span className="text-xs font-body">Satisfação garantida ou dinheiro de volta</span>
+              </div>
+              <div className="flex items-center gap-3 text-muted-foreground">
+                <CreditCard size={16} />
+                <span className="text-xs font-body">Parcele em até 12x no cartão</span>
+              </div>
             </div>
           </div>
         </div>
@@ -208,4 +428,3 @@ const Checkout = () => {
 };
 
 export default Checkout;
-

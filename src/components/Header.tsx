@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X, ShoppingBag, Instagram, Facebook } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { CartDrawer } from "./CartDrawer";
 import { useCart } from "@/contexts/CartContext";
@@ -19,6 +19,10 @@ const Header = () => {
   const location = useLocation();
   const { itemCount } = useCart();
   const { data: config } = useSiteConfig();
+
+  useEffect(() => {
+    sessionStorage.setItem("@quadrzz:hasInteracted", "true");
+  }, [location.pathname]);
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50">

@@ -5,7 +5,10 @@ import { Button } from "@/components/ui/button";
 import { products as staticProducts } from "@/data/products";
 import { useProduct } from "@/hooks/useProducts";
 import MobileConversionBar from "@/components/MobileConversionBar";
-import { Check } from "lucide-react";
+import UpsellBundle from "@/components/UpsellBundle";
+import CountdownTimer, { useCountdown } from "@/components/CountdownTimer";
+import SocialProof from "@/components/SocialProof";
+import { Check, Flame } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 
 const ProductDetail = () => {
@@ -20,6 +23,10 @@ const ProductDetail = () => {
 
   const [selectedSize, setSelectedSize] = useState(0);
   const [selectedMaterial, setSelectedMaterial] = useState(0);
+  const [showUpsell, setShowUpsell] = useState(true);
+
+  // Countdown for promotions
+  const showTimer = useCountdown(id || "default", 2);
 
   // Normalize product data
   const product = staticProduct
@@ -38,6 +45,12 @@ const ProductDetail = () => {
       }
 
     : null;
+
+  // Handle promo prices
+  const hasPromo = product && "isPromo" in product && product.isPromo && "promoDiscount" in product;
+  const promoDiscount = hasPromo ? (product as any).promoDiscount : 0;
+  const finalPrice = hasPromo ? (product!.price as number * (1 - promoDiscount! / 100)) : (product?.price ?? 0);
+  const isLowStock = product && "stockCount" in product && (product as any).stockCount <= 5;
 
   if (isLoading && !staticProduct) {
     return (
@@ -62,7 +75,7 @@ const ProductDetail = () => {
     addToCart({
       productId: product.id,
       name: product.name,
-      price: product.price,
+      price: hasPromo ? finalPrice : product.price,
       image: product.image,
       size: product.sizes[selectedSize],
       material: product.materials[selectedMaterial],
@@ -76,7 +89,7 @@ const ProductDetail = () => {
     addToCart({
       productId: product.id,
       name: product.name,
-      price: product.price,
+      price: hasPromo ? finalPrice : product.price,
       image: product.image,
       size: product.sizes[selectedSize],
       material: product.materials[selectedMaterial],
@@ -111,9 +124,41 @@ const ProductDetail = () => {
           >
             <p className="text-xs text-muted-foreground font-body mb-2">{product.category}</p>
             <h1 className="text-3xl md:text-4xl">{product.name}</h1>
-            <p className="mt-2 text-2xl font-display tabular-nums">
-              R$ {product.price.toFixed(2).replace(".", ",")}
-            </p>
+            
+            {hasPromo ? (
+              <div className="mt-2 flex items-baseline gap-3">
+                <p className="text-2xl font-display tabular-nums text-red-600 font-bold">
+                  R$ {finalPrice.toFixed(2).replace(".", ",")}
+                </p>
+                <p className="text-lg text-muted-foreground font-body tabular-nums line-through">
+                  R$ {product.price.toFixed(2).replace(".", ",")}
+                </p>
+                <span className="bg-red-600 text-white text-[10px] font-bold px-2 py-0.5">
+                  -{promoDiscount}% OFF
+                </span>
+              </div>
+            ) : (
+              <p className="mt-2 text-2xl font-display tabular-nums">
+                R$ {product.price.toFixed(2).replace(".", ",")}
+              </p>
+            )}
+
+            {isLowStock && (
+              <div className="mt-2 flex items-center gap-2 text-red-600">
+                <Flame size={14} />
+                <span className="text-xs font-bold">Apenas {(product as any).stockCount} unidades disponíveis!</span>
+              </div>
+            )}
+
+            {hasPromo && showTimer && (
+              <div className="mt-3">
+                <CountdownTimer hours={2} />
+              </div>
+            )}
+
+            <div className="mt-3">
+              <SocialProof productId={product.id} />
+            </div>
             <p className="mt-6 text-sm text-muted-foreground font-body leading-relaxed">
               {product.description}
             </p>
@@ -160,6 +205,29 @@ const ProductDetail = () => {
                 COMPRAR AGORA
               </Button>
             </div>
+
+            {showUpsell && (
+              <div className="mt-6">
+                <UpsellBundle
+                  productName={product.name}
+                  productPrice={finalPrice}
+                  onClose={() => setShowUpsell(false)}
+                  onAddToCart={() => {
+                    addToCart({
+                      productId: product.id,
+                      name: product.name,
+                      price: finalPrice,
+                      image: product.image,
+                      size: product.sizes[selectedSize],
+                      material: product.materials[selectedMaterial],
+                      quantity: 2,
+                    });
+                    setIsCartOpen(true);
+                    setShowUpsell(false);
+                  }}
+                />
+              </div>
+            )}
 
             <div className="mt-10 space-y-3">
               {[

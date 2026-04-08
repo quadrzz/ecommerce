@@ -1,8 +1,14 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import type { Product } from "@/data/products";
+import { Flame } from "lucide-react";
 
-const ProductCard = ({ product, index = 0 }: { product: Product; index?: number }) => (
+const ProductCard = ({ product, index = 0 }: { product: Product; index?: number }) => {
+  const hasPromo = product.isPromo && product.promoDiscount;
+  const promoPrice = hasPromo ? product.price * (1 - product.promoDiscount! / 100) : null;
+  const isLowStock = product.stockCount && product.stockCount <= 5;
+
+  return (
   <motion.div
     initial={{ opacity: 0, y: 30 }}
     whileInView={{ opacity: 1, y: 0 }}
@@ -17,6 +23,21 @@ const ProductCard = ({ product, index = 0 }: { product: Product; index?: number 
           className="w-full h-full object-cover transition-all duration-500 group-hover:scale-105 group-hover:saturate-[1.1] group-hover:contrast-[1.1]"
           loading="lazy"
         />
+        {(hasPromo || isLowStock) && (
+          <div className="absolute top-3 left-3 flex flex-col gap-1.5">
+            {hasPromo && (
+              <span className="bg-red-600 text-white text-[10px] font-bold px-2 py-1 tracking-wider">
+                -{product.promoDiscount}% OFF
+              </span>
+            )}
+            {isLowStock && (
+              <span className="bg-foreground text-background text-[10px] font-bold px-2 py-1 tracking-wider flex items-center gap-1">
+                <Flame size={10} />
+                {product.stockCount} RESTAM
+              </span>
+            )}
+          </div>
+        )}
         <div className="absolute inset-x-0 bottom-0 p-4 bg-gradient-to-t from-background/90 to-transparent translate-y-full group-hover:translate-y-0 transition-transform duration-300 flex items-end justify-center">
           <span className="text-xs font-display tracking-widest border border-foreground/50 bg-background/50 backdrop-blur-sm px-4 py-2 metal-border font-bold">VER DETALHES</span>
         </div>
@@ -24,12 +45,26 @@ const ProductCard = ({ product, index = 0 }: { product: Product; index?: number 
       <div className="mt-4 space-y-1">
         <p className="text-xs text-muted-foreground font-body">{product.category}</p>
         <h3 className="text-sm font-display tracking-wider">{product.name}</h3>
-        <p className="text-sm text-muted-foreground font-body tabular-nums">
-          R$ {product.price.toFixed(2).replace(".", ",")}
-        </p>
+        <div className="flex items-center gap-2">
+          {hasPromo ? (
+            <>
+              <p className="text-sm text-muted-foreground font-body tabular-nums line-through">
+                R$ {product.price.toFixed(2).replace(".", ",")}
+              </p>
+              <p className="text-sm text-red-600 font-body tabular-nums font-bold">
+                R$ {promoPrice!.toFixed(2).replace(".", ",")}
+              </p>
+            </>
+          ) : (
+            <p className="text-sm text-muted-foreground font-body tabular-nums">
+              R$ {product.price.toFixed(2).replace(".", ",")}
+            </p>
+          )}
+        </div>
       </div>
     </Link>
   </motion.div>
-);
+  );
+};
 
 export default ProductCard;

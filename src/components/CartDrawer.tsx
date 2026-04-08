@@ -1,8 +1,10 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useCart } from "@/contexts/CartContext";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ShoppingBag, X, Plus, Minus, Trash2 } from "lucide-react";
+import { ShoppingBag, X, Plus, Minus, Trash2, Tag, CheckCircle } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -10,9 +12,21 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import CrossSell from "./CrossSell";
 
 export function CartDrawer({ children }: { children: React.ReactNode }) {
-  const { items, removeFromCart, updateQuantity, cartTotal, isCartOpen, setIsCartOpen } = useCart();
+  const { items, removeFromCart, updateQuantity, cartTotal, isCartOpen, setIsCartOpen, coupon, applyCoupon, removeCoupon, discount, addToCart } = useCart();
+  const [couponCode, setCouponCode] = useState("");
+  const [couponMessage, setCouponMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+
+  const handleApplyCoupon = () => {
+    if (!couponCode.trim()) return;
+    const result = applyCoupon(couponCode);
+    setCouponMessage({
+      type: result.success ? "success" : "error",
+      text: result.message
+    });
+  };
 
   return (
     <Sheet open={isCartOpen} onOpenChange={setIsCartOpen}>
@@ -63,15 +77,89 @@ export function CartDrawer({ children }: { children: React.ReactNode }) {
                   </div>
                 </div>
               ))}
+
+              {!coupon && (
+                <div className="bg-secondary p-4 metal-border">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Tag size={14} className="text-accent" />
+                    <span className="text-xs font-display tracking-wider">CUPO DE DESCONTO</span>
+                  </div>
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="Digite o código"
+                      value={couponCode}
+                      onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                      className="text-xs h-9"
+                    />
+                    <Button variant="outline" size="sm" onClick={handleApplyCoupon} className="h-9">
+                      OK
+                    </Button>
+                  </div>
+                  {couponMessage && (
+                    <p className={`text-[10px] mt-2 ${couponMessage.type === "success" ? "text-green-600" : "text-red-500"}`}>
+                      {couponMessage.text}
+                    </p>
+                  )}
+                  <div className="flex flex-wrap gap-2 mt-3">
+                    {["QUADRZZ10", "PRIMEIRACOMPRA"].map((code) => (
+                      <button
+                        key={code}
+                        onClick={() => { setCouponCode(code); handleApplyCoupon(); }}
+                        className="text-[10px] text-muted-foreground border border-border px-2 py-1 hover:border-foreground transition-colors"
+                      >
+                        {code}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {coupon && (
+                <div className="bg-green-600/10 border border-green-600/30 p-3 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle size={14} className="text-green-600" />
+                    <span className="text-xs text-green-600 font-medium">
+                      {coupon.code} - {coupon.discountPercent}% OFF
+                    </span>
+                  </div>
+                  <button onClick={removeCoupon} className="text-xs text-muted-foreground hover:text-foreground">
+                    Remover
+                  </button>
+                </div>
+              )}
+
+              <CrossSell onAddItem={(productId, name, price, image) => {
+                addToCart({
+                  productId,
+                  name,
+                  price,
+                  image,
+                  size: "30x40cm",
+                  material: "Alumínio Premium",
+                  quantity: 1,
+                });
+              }} />
             </div>
           )}
         </ScrollArea>
 
         {items.length > 0 && (
           <div className="pt-6 border-t border-border mt-auto">
+            {coupon && (
+              <div className="flex justify-between items-center mb-2 text-sm">
+                <span className="text-muted-foreground">Subtotal</span>
+                <span className="text-muted-foreground line-through">R$ {cartTotal.toFixed(2).replace(".", ",")}</span>
+              </div>
+            )}
+            {coupon && (
+              <div className="flex justify-between items-center mb-2 text-green-600">
+                <span className="text-xs">Desconto</span>
+                <span className="text-xs">-R$ {discount.toFixed(2).replace(".", ",")}</span>
+              </div>
+            )}
             <div className="flex justify-between items-center mb-6">
               <span className="font-display tracking-widest text-sm">TOTAL</span>
-              <span className="font-display text-xl">R$ {cartTotal.toFixed(2).replace(".", ",")}</span>
+              <span className="font-display text-xl">R$ {(cartTotal - discount).toFixed(2).replace(".", ",")}</span>
             </div>
             <Link to="/checkout" className="block">
               <Button variant="metal" size="xl" className="w-full border-b border-border">

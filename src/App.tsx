@@ -17,9 +17,61 @@ import NotFound from "./pages/NotFound";
 import { CartProvider } from "./contexts/CartContext";
 import Checkout from "./pages/Checkout";
 import OrderSuccess from "./pages/OrderSuccess";
+import EmailCapturePopup, { useEmailPopup } from "./components/EmailCapturePopup";
 
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: (failureCount, error: any) => {
+        // Only retry Supabase 429 errors up to 3 times
+        if (error?.code === "429" || error?.status === 429) {
+          return failureCount < 3;
+        }
+        return failureCount < 2;
+      },
+      retryDelay: (attemptIndex) => {
+        // Exponential backoff: 1s, 2s, 4s
+        return Math.min(1000 * 2 ** attemptIndex, 4000);
+      },
+      staleTime: 5 * 60 * 1000, // 5 min - avoids unnecessary refetches
+      refetchOnWindowFocus: false, // prevents extra requests
+    },
+  },
+});
+
+const AppContent = () => {
+  const { showPopup, handleClose, handleSuccess, popupCode, popupDiscount } = useEmailPopup();
+  
+  return (
+    <>
+      <Header />
+      <Routes>
+        <Route path="/" element={<Index />} />
+        <Route path="/colecao" element={<Collection />} />
+        <Route path="/produto/:id" element={<ProductDetail />} />
+        <Route path="/personalizar" element={<Customize />} />
+        <Route path="/sobre" element={<About />} />
+        <Route path="/checkout" element={<Checkout />} />
+        <Route path="/order-success" element={<OrderSuccess />} />
+
+        <Route path="/admin" element={<AdminLogin />} />
+        <Route path="/manager" element={<Manager />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+      <Footer />
+      <WhatsAppFAB />
+      {showPopup && (
+        <EmailCapturePopup 
+          onClose={handleClose} 
+          onSuccess={handleSuccess}
+          popupCode={popupCode}
+          popupDiscount={popupDiscount}
+        />
+      )}
+    </>
+  );
+};
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -28,22 +80,7 @@ const App = () => (
         <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Header />
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/colecao" element={<Collection />} />
-          <Route path="/produto/:id" element={<ProductDetail />} />
-          <Route path="/personalizar" element={<Customize />} />
-          <Route path="/sobre" element={<About />} />
-          <Route path="/checkout" element={<Checkout />} />
-          <Route path="/order-success" element={<OrderSuccess />} />
-
-          <Route path="/admin" element={<AdminLogin />} />
-          <Route path="/manager" element={<Manager />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-        <Footer />
-        <WhatsAppFAB />
+        <AppContent />
       </BrowserRouter>
       </TooltipProvider>
     </CartProvider>

@@ -137,7 +137,6 @@ export type Database = {
         Relationships: []
       }
       site_config: {
-
         Row: {
           hero_image_url: string | null
           hero_subtitle: string | null
@@ -161,6 +160,27 @@ export type Database = {
           id?: number
           logo_url?: string | null
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string | null
+          id: string
+          role: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          role?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          role?: string
+          user_id?: string
         }
         Relationships: []
       }

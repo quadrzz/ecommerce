@@ -120,7 +120,8 @@ export const OrdersTab = () => {
                 <div className="flex items-center justify-between md:justify-end gap-6 border-t md:border-t-0 border-border pt-4 md:pt-0">
                   <div className="text-right">
                     <p className="text-xs text-muted-foreground font-display">TOTAL</p>
-                    <p className="text-xl font-display">R$ {order.total_amount.toFixed(2).replace(".", ",")}</p>
+                    <p className="text-xl font-display">R$ {Number(order.total_amount).toFixed(2).replace(".", ",")}</p>
+
                   </div>
                   
                   <div className="flex gap-2">

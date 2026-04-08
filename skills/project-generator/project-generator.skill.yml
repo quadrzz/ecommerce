@@ -1,0 +1,21 @@
+# Project Generator Skill
+name: project-generator
+description: Scaffold boilerplate projects in 12+ languages and frameworks
+version: 0.0.1
+triggers:
+  - project generator
+  - scaffold project
+  - create project
+  - new project
+  - gerar projeto
+  - criar projeto
+  - novo projeto
+  - scaffold
+  - boilerplate
+allowed:
+  - Bash
+  - Write
+  - Read
+  - Glob
+  - Grep
+  - Edit

@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Upload, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
-const sizes = ["30x40cm", "40x60cm", "60x90cm", "80x120cm"];
+const sizes = ["21x30cm (A4)"];
 const materials = ["Alumínio Premium", "MDF Alta Densidade"];
 
 const Customize = () => {
@@ -59,7 +59,8 @@ Material: ${materials[selectedMaterial]}
 Observações: ${notes || "Nenhuma"}
 Imagem: ${imageUrl}`;
     
-    window.open(`https://wa.me/5581991169932?text=${encodeURIComponent(msg)}`, "_blank");
+    window.location.href = `https://wa.me/5581991169932?text=${encodeURIComponent(msg)}`;
+
   };
 
   return (
