@@ -178,7 +178,7 @@ const Checkout = () => {
       toast.success("Pedido criado! Redirecionando para o WhatsApp...");
       setTimeout(() => {
         window.open(whatsappUrl, '_blank');
-        window.location.href = "/pedido-sucesso";
+        window.location.href = "/order-success";
       }, 1000);
     } catch (error: any) {
       console.error("Erro no checkout:", error);
