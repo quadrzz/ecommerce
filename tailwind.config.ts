@@ -94,4 +94,10 @@ export default {
     },
   },
   plugins: [require("tailwindcss-animate")],
+  safelist: [
+    {
+      pattern: /scrollbar/,
+      variants: ["hover", "group-hover"],
+    },
+  ],
 } satisfies Config;

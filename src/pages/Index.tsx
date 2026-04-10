@@ -104,20 +104,21 @@ const Index = () => {
             
             CATEGORIAS
           </motion.h2>
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+          <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide md:grid md:grid-cols-5 md:overflow-visible">
             {categories.map((cat, i) =>
             <motion.div
               key={cat.slug}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: i * 0.05, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}>
+              transition={{ delay: i * 0.05, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+              className="flex-shrink-0 w-[140px] md:w-auto">
               
                 <Link to={`/colecao?cat=${cat.slug}`} className="group block">
                   <div className="aspect-[3/4] bg-secondary overflow-hidden metal-border relative">
                     <img src={cat.image} alt={cat.name} className="w-full h-full object-cover transition-all duration-400 group-hover:scale-105" loading="lazy" />
                     <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
-                    <span className="absolute bottom-4 left-4 font-display text-sm tracking-wider text-foreground">{cat.name.toUpperCase()}</span>
+                    <span className="absolute bottom-4 left-4 font-display text-xs md:text-sm tracking-wider text-foreground">{cat.name}</span>
                   </div>
                 </Link>
               </motion.div>
