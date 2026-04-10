@@ -4,7 +4,7 @@ import { Navigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
 const AdminLogin = () => {
-  const { user, isAdmin, loading: authLoading, signIn } = useAuth();
+  const { user, isAdmin, loading, signIn, signOut } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -16,10 +16,14 @@ const AdminLogin = () => {
     setSubmitting(true);
     
     try {
-      const { error: err } = await signIn(email, password);
+      const { data, error: err } = await signIn(email, password);
       if (err) {
         setError(err.message === "Invalid login credentials" ? "Email ou senha incorretos." : err.message);
         setSubmitting(false);
+      } else if (data?.user) {
+        setTimeout(() => {
+          setSubmitting(false);
+        }, 1000);
       }
     } catch (err: any) {
       setError(err.message || "Erro ao fazer login.");
@@ -27,16 +31,29 @@ const AdminLogin = () => {
     }
   };
 
-  if (authLoading && !submitting) {
+  if (user && isAdmin) {
+    return <Navigate to="/manager" replace />;
+  }
+
+  if (user && !isAdmin) {
+    return (
+      <main className="pt-28 pb-20 flex items-center justify-center min-h-screen">
+        <div className="w-full max-w-sm px-4 text-center">
+          <p className="text-destructive font-body">Sua conta não possui permissão de administrador.</p>
+          <Button variant="outline" className="mt-4" onClick={() => signOut()}>
+            Sair
+          </Button>
+        </div>
+      </main>
+    );
+  }
+
+  if (loading) {
     return (
       <main className="pt-28 pb-20 flex items-center justify-center min-h-screen">
         <p className="text-muted-foreground font-body">Carregando...</p>
       </main>
     );
-  }
-
-  if (user && isAdmin) {
-    return <Navigate to="/manager" replace />;
   }
 
   return (
@@ -71,11 +88,6 @@ const AdminLogin = () => {
             {submitting ? "ENTRANDO..." : "ENTRAR"}
           </Button>
         </form>
-        {user && !isAdmin && (
-          <p className="text-xs text-destructive font-body mt-4 text-center">
-            Sua conta não possui permissão de administrador.
-          </p>
-        )}
       </div>
     </main>
   );
