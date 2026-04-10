@@ -81,9 +81,10 @@ export const products: Product[] = [
 ];
 
 export const categories = [
-  { name: "Carros", slug: "carros", image: productCar1 },
-  { name: "Frases", slug: "frases", image: productPhrase1 },
-  { name: "Personalizados", slug: "personalizados", image: productCustom1 },
-  { name: "Minimalistas", slug: "minimalistas", image: productMinimal1 },
-  { name: "Lifestyle", slug: "lifestyle", image: productLifestyle1 },
+  { name: "CARROS", slug: "carros", image: productCar1 },
+  { name: "FRASES LIFESTYLE", slug: "frases-lifestyle", image: productPhrase1 },
+  { name: "ANIME", slug: "anime", image: productCustom1 },
+  { name: "AESTHETIC", slug: "aesthetic", image: productMinimal1 },
+  { name: "MINIMALISTA", slug: "minimalista", image: productLifestyle1 },
+  { name: "NATURAL", slug: "natural", image: productCar1 },
 ];
