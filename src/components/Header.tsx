@@ -28,7 +28,7 @@ const Header = () => {
     <header className="fixed top-0 left-0 right-0 z-50">
       {/* Top bar */}
       <div className="bg-secondary text-muted-foreground text-xs font-body tracking-widest text-center py-2 uppercase">
-        Frete grátis para todo o Brasil • Produção sob demanda
+        Frete grátis a partir de R$ 149 • Produção sob demanda
       </div>
       
       <nav className="bg-background/80 backdrop-blur-md border-b border-border">
