@@ -2,11 +2,13 @@ import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { Navigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { Eye, EyeOff } from "lucide-react";
 
 const AdminLogin = () => {
   const { user, isAdmin, loading, signIn, signOut } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
@@ -74,14 +76,23 @@ const AdminLogin = () => {
           </div>
           <div>
             <label className="text-xs font-display tracking-widest mb-2 block">SENHA</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full bg-secondary border border-border text-foreground font-body text-sm p-3 focus:outline-none focus:border-foreground/40 transition-colors"
-              required
-              disabled={submitting}
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full bg-secondary border border-border text-foreground font-body text-sm p-3 pr-10 focus:outline-none focus:border-foreground/40 transition-colors"
+                required
+                disabled={submitting}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
           </div>
           {error && <p className="text-xs text-destructive font-body">{error}</p>}
           <Button variant="metal" size="lg" className="w-full" type="submit" disabled={submitting}>
