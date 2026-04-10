@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/sheet";
 import CrossSell from "./CrossSell";
 
-const WHATSAPP_NUMBER = "5531982463680";
+const WHATSAPP_NUMBER = "5581991169932";
 
 export function CartDrawer({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
