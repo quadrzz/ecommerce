@@ -185,7 +185,7 @@ export function CartDrawer({ children }: { children: React.ReactNode }) {
               <span className="font-display text-xl">R$ {(cartTotal - discount).toFixed(2).replace(".", ",")}</span>
             </div>
             <Button variant="metal" size="xl" className="w-full border-b border-border" onClick={handleFinalizePurchase}>
-                FINALIZAR COMPRA
+                FINALIZAR NO WHATSAPP
               </Button>
           </div>
         )}
