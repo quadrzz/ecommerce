@@ -33,20 +33,20 @@ export function CartDrawer({ children }: { children: React.ReactNode }) {
 
   const handleFinalizePurchase = () => {
     const itemsList = items.map(item => 
-      `• ${item.name} (${item.size}, ${item.material}) - Qtd: ${item.quantity} - R$ ${(item.price * item.quantity).toFixed(2)}`
-    ).join('%0A');
+      `• ${item.name}%0A  Tamanho: ${item.size}%0A  Material: ${item.material}%0A  Qtd: ${item.quantity}%0A  R$ ${(item.price * item.quantity).toFixed(2)}`
+    ).join('%0A%0A');
 
-    const subtotal = cartTotal.toFixed(2);
-    const total = (cartTotal - discount).toFixed(2);
-    const discountText = coupon ? `%0A*Desconto (${coupon.code}):* -R$ ${discount.toFixed(2)}` : '';
+    const subtotal = cartTotal.toFixed(2).replace(".", ",");
+    const total = (cartTotal - discount).toFixed(2).replace(".", ",");
+    const discountText = coupon ? `%0A*Cupom applied:* ${coupon.code} (-${coupon.discountPercent}%)%0A*Desconto:* -R$ ${discount.toFixed(2).replace(".", ",")}` : '';
 
     const message = `*QUADRZZ - NOVO PEDIDO*%0A%0A` +
-      `*ITENS:*%0A${itemsList}%0A%0A` +
+      `*PRODUTOS:*%0A%0A${itemsList}%0A%0A` +
       `*Subtotal:* R$ ${subtotal}${discountText}%0A` +
       `*TOTAL:* R$ ${total}%0A%0A` +
-      `_Por favor, informe seus dados de entrega._`;
+      `_Por favor, informe:%0A- Nome completo%0A- Endereço completo%0A- CPF (para nota fiscal)_`;
 
-    const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${message}`;
+    const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
     setIsCartOpen(false);
   };
