@@ -53,7 +53,7 @@ export function CartDrawer({ children }: { children: React.ReactNode }) {
       `_Pedido realizado via site_`;
 
     const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
-    window.open(whatsappUrl, '_blank');
+    window.location.href = whatsappUrl;
     setIsCartOpen(false);
   };
 
