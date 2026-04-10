@@ -112,7 +112,7 @@ const Index = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.05, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-              className="flex-shrink-0 w-[140px]">
+              className="flex-shrink-0 w-[160px] lg:w-[200px]">
               
                 <Link to={`/colecao?cat=${cat.slug}`} className="group block">
                   <div className="aspect-[3/4] bg-secondary overflow-hidden metal-border relative">

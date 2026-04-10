@@ -61,7 +61,7 @@ const Collection = () => {
           <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
             <button
               onClick={() => setSearchParams({})}
-              className={`text-xs font-display tracking-widest px-4 py-2 border transition-colors flex-shrink-0 ${
+              className={`text-xs font-display tracking-widest px-4 py-2 border transition-colors flex-shrink-0 whitespace-nowrap ${
                 activeCat === "todos" ? "border-foreground text-foreground" : "border-border text-muted-foreground hover:border-foreground/40"
               }`}
             >
@@ -71,7 +71,7 @@ const Collection = () => {
               <button
                 key={cat.slug}
                 onClick={() => setSearchParams({ cat: cat.slug })}
-                className={`text-xs font-display tracking-widest px-4 py-2 border transition-colors flex-shrink-0 ${
+                className={`text-xs font-display tracking-widest px-4 py-2 border transition-colors flex-shrink-0 whitespace-nowrap ${
                   activeCat === cat.slug ? "border-foreground text-foreground" : "border-border text-muted-foreground hover:border-foreground/40"
                 }`}
               >
