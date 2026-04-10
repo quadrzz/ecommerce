@@ -15,8 +15,6 @@ import AdminLogin from "./pages/AdminLogin";
 import Manager from "./pages/Manager";
 import NotFound from "./pages/NotFound";
 import { CartProvider } from "./contexts/CartContext";
-import Checkout from "./pages/Checkout";
-import OrderSuccess from "./pages/OrderSuccess";
 import EmailCapturePopup, { useEmailPopup } from "./components/EmailCapturePopup";
 
 
@@ -52,8 +50,6 @@ const AppContent = () => {
         <Route path="/produto/:id" element={<ProductDetail />} />
         <Route path="/personalizar" element={<Customize />} />
         <Route path="/sobre" element={<About />} />
-        <Route path="/checkout" element={<Checkout />} />
-        <Route path="/order-success" element={<OrderSuccess />} />
 
         <Route path="/admin" element={<AdminLogin />} />
         <Route path="/manager" element={<Manager />} />

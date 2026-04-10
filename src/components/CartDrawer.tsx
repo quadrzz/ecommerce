@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useCart } from "@/contexts/CartContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,7 +14,10 @@ import {
 } from "@/components/ui/sheet";
 import CrossSell from "./CrossSell";
 
+const WHATSAPP_NUMBER = "5531982463680";
+
 export function CartDrawer({ children }: { children: React.ReactNode }) {
+  const navigate = useNavigate();
   const { items, removeFromCart, updateQuantity, cartTotal, isCartOpen, setIsCartOpen, coupon, applyCoupon, removeCoupon, discount, addToCart } = useCart();
   const [couponCode, setCouponCode] = useState("");
   const [couponMessage, setCouponMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
@@ -26,6 +29,26 @@ export function CartDrawer({ children }: { children: React.ReactNode }) {
       type: result.success ? "success" : "error",
       text: result.message
     });
+  };
+
+  const handleFinalizePurchase = () => {
+    const itemsList = items.map(item => 
+      `• ${item.name} (${item.size}, ${item.material}) - Qtd: ${item.quantity} - R$ ${(item.price * item.quantity).toFixed(2)}`
+    ).join('%0A');
+
+    const subtotal = cartTotal.toFixed(2);
+    const total = (cartTotal - discount).toFixed(2);
+    const discountText = coupon ? `%0A*Desconto (${coupon.code}):* -R$ ${discount.toFixed(2)}` : '';
+
+    const message = `*QUADRZZ - NOVO PEDIDO*%0A%0A` +
+      `*ITENS:*%0A${itemsList}%0A%0A` +
+      `*Subtotal:* R$ ${subtotal}${discountText}%0A` +
+      `*TOTAL:* R$ ${total}%0A%0A` +
+      `_Por favor, informe seus dados de entrega._`;
+
+    const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${message}`;
+    window.open(whatsappUrl, '_blank');
+    setIsCartOpen(false);
   };
 
   return (
@@ -161,11 +184,9 @@ export function CartDrawer({ children }: { children: React.ReactNode }) {
               <span className="font-display tracking-widest text-sm">TOTAL</span>
               <span className="font-display text-xl">R$ {(cartTotal - discount).toFixed(2).replace(".", ",")}</span>
             </div>
-            <Link to="/checkout" className="block">
-              <Button variant="metal" size="xl" className="w-full border-b border-border">
+            <Button variant="metal" size="xl" className="w-full border-b border-border" onClick={handleFinalizePurchase}>
                 FINALIZAR COMPRA
               </Button>
-            </Link>
           </div>
         )}
       </SheetContent>
