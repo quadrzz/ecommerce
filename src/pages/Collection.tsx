@@ -58,10 +58,10 @@ const Collection = () => {
         <h1 className="text-3xl md:text-5xl mb-8">COLEÇÃO</h1>
         
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
-          <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+          <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide md:flex-nowrap md:overflow-visible">
             <button
               onClick={() => setSearchParams({})}
-              className={`text-xs font-display tracking-widest px-4 py-2 border transition-colors flex-shrink-0 whitespace-nowrap ${
+              className={`text-xs font-display tracking-widest px-3 py-2 border transition-colors flex-shrink-0 md:flex-none ${
                 activeCat === "todos" ? "border-foreground text-foreground" : "border-border text-muted-foreground hover:border-foreground/40"
               }`}
             >
@@ -71,7 +71,7 @@ const Collection = () => {
               <button
                 key={cat.slug}
                 onClick={() => setSearchParams({ cat: cat.slug })}
-                className={`text-xs font-display tracking-widest px-4 py-2 border transition-colors flex-shrink-0 whitespace-nowrap ${
+                className={`text-xs font-display tracking-widest px-3 py-2 border transition-colors flex-shrink-0 md:flex-none ${
                   activeCat === cat.slug ? "border-foreground text-foreground" : "border-border text-muted-foreground hover:border-foreground/40"
                 }`}
               >
