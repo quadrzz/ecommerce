@@ -13,12 +13,16 @@ export function useAuth() {
 
     const checkAdmin = async (userId: string) => {
       try {
-        const { data } = await supabase
+        console.log("Checking admin for user:", userId);
+        
+        const { data, error } = await supabase
           .from("user_roles")
           .select("role")
           .eq("user_id", userId)
           .eq("role", "admin")
           .maybeSingle();
+        
+        console.log("Admin check result:", { data, error });
         
         if (mounted) {
           setIsAdmin(!!data);
@@ -67,7 +71,9 @@ export function useAuth() {
   }, []);
 
   const signIn = async (email: string, password: string) => {
+    console.log("Attempting sign in with:", email);
     const result = await supabase.auth.signInWithPassword({ email, password });
+    console.log("Sign in result:", result);
     return result;
   };
 

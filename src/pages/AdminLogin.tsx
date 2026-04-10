@@ -16,18 +16,23 @@ const AdminLogin = () => {
     e.preventDefault();
     setError("");
     setSubmitting(true);
+    console.log("Submitting form with email:", email);
     
     try {
       const { data, error: err } = await signIn(email, password);
+      console.log("Login response:", { data, err });
+      
       if (err) {
         setError(err.message === "Invalid login credentials" ? "Email ou senha incorretos." : err.message);
         setSubmitting(false);
       } else if (data?.user) {
+        console.log("Login successful, user:", data.user);
         setTimeout(() => {
           setSubmitting(false);
         }, 1000);
       }
     } catch (err: any) {
+      console.error("Login catch error:", err);
       setError(err.message || "Erro ao fazer login.");
       setSubmitting(false);
     }
