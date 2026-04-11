@@ -32,9 +32,20 @@ const Header = () => {
       </div>
       
       <nav className="bg-background/80 backdrop-blur-md border-b border-border">
-        <div className="max-w-7xl mx-auto px-4 md:px-8 flex items-center justify-center h-16 relative">
-          {/* Left nav - hidden on mobile */}
-          <div className="hidden md:flex items-center gap-8 absolute left-0">
+        <div className="max-w-7xl mx-auto px-4 md:px-8 flex items-center justify-between h-16 relative">
+          {/* Logo - Left */}
+          <div className="flex justify-start z-50">
+            <Link to="/" className="text-2xl font-display tracking-widest leading-none inline-block">
+              {config?.logo_url ? (
+                <img src={config.logo_url} alt="Quadrzz" className="h-6 md:h-8 object-contain" />
+              ) : (
+                "QUADRZZ"
+              )}
+            </Link>
+          </div>
+          
+          {/* Center nav - hidden on mobile */}
+          <div className="hidden md:flex items-center gap-8">
             {navLinks.map((link) => (
               <Link
                 key={link.path}
@@ -50,19 +61,8 @@ const Header = () => {
             ))}
           </div>
           
-          {/* Center logo */}
-          <div className="flex justify-center">
-            <Link to="/" className="text-2xl font-display tracking-widest leading-none z-50 inline-block">
-              {config?.logo_url ? (
-                <img src={config.logo_url} alt="Quadrzz" className="h-6 md:h-8 object-contain" />
-              ) : (
-                "QUADRZZ"
-              )}
-            </Link>
-          </div>
-          
-          {/* Right - Cart */}
-          <div className="absolute right-0 flex items-center gap-4">
+          {/* Right - Cart + Mobile Menu */}
+          <div className="flex items-center gap-4">
             <CartDrawer>
               <button className="relative p-2 text-foreground hover:opacity-70 transition-opacity">
                 <ShoppingBag size={20} />
