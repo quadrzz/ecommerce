@@ -1,4 +1,4 @@
-import productCar1 from "@/assets/product-car-1.jpg";
+﻿import productCar1 from "@/assets/product-car-1.jpg";
 import productPhrase1 from "@/assets/product-phrase-1.jpg";
 import productMinimal1 from "@/assets/product-minimal-1.jpg";
 import productLifestyle1 from "@/assets/product-lifestyle-1.jpg";
@@ -81,10 +81,11 @@ export const products: Product[] = [
 ];
 
 export const categories = [
-  { name: "CARROS", slug: "carros", image: productCar1 },
-  { name: "FRASES LIFESTYLE", slug: "frases-lifestyle", image: productPhrase1 },
-  { name: "ANIME", slug: "anime", image: productCustom1 },
-  { name: "AESTHETIC", slug: "aesthetic", image: productMinimal1 },
-  { name: "MINIMALISTA", slug: "minimalista", image: productLifestyle1 },
-  { name: "NATURAL", slug: "natural", image: productCar1 },
+  { name: "VELOCIDADE", slug: "carros", image: productCar1, tagline: "Para quem vive velocidade" },
+  { name: "FRASES", slug: "frases-lifestyle", image: productPhrase1, tagline: "Para quem não aceita o comum" },
+  { name: "ANIME", slug: "anime", image: productCustom1, tagline: "Para mentes que sonam" },
+  { name: "AESTHETIC", slug: "aesthetic", image: productMinimal1, tagline: "Para ambientes com personalidade" },
+  { name: "MINIMALISTA", slug: "minimalista", image: productLifestyle1, tagline: "Para mentes ambiciosas" },
+  { name: "NATURAL", slug: "natural", image: productCar1, tagline: "Para quem busca equilíbrio" },
 ];
+
