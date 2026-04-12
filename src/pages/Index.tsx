@@ -96,6 +96,17 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Frete Grátis Banner */}
+      <div className="bg-orange-500 py-3 overflow-hidden">
+        <div className="flex animate-marquee whitespace-nowrap">
+          {[...Array(8)].map((_, i) => (
+            <span key={i} className="text-black font-display text-sm md:text-base tracking-wider px-8">
+              🚚 FRETE GRÁTIS A PARTIR DE R$149 • FRETE GRÁTIS A PARTIR DE R$149 • FRETE GRÁTIS A PARTIR DE R$149 • 
+            </span>
+          ))}
+        </div>
+      </div>
+
       {/* Categories */}
       <section className="py-20 md:py-32">
         <div className="max-w-7xl mx-auto px-4 md:px-8">
@@ -171,7 +182,7 @@ const Index = () => {
       {/* Ofertas Especiais */}
       <section className="py-20 md:py-32">
         <div className="max-w-7xl mx-auto px-4 md:px-8">
-          <h2 className="text-2xl md:text-4xl mb-12">OFERTAS ESPECIAIS</h2>
+          <h2 className="text-2xl md:text-4xl mb-12 text-center">OFERTAS ESPECIAIS</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
               { title: "FRETE GRÁTIS", desc: "A partir de R$149", icon: "🚚" },

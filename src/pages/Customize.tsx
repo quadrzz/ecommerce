@@ -72,11 +72,11 @@ Imagem: ${imageUrl}`;
             Envie sua referência. Nós transformamos em presença. Sua imagem em alumínio premium ou MDF de alta densidade.
           </p>
 
-          <div className="mt-12 space-y-10">
+          <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Upload */}
-            <div>
+            <div className="md:col-span-2">
               <p className="text-xs font-display tracking-widest mb-3">SUA IMAGEM</p>
-              <label className="flex flex-col items-center justify-center h-48 border border-dashed border-border hover:border-foreground/30 transition-colors cursor-pointer bg-secondary">
+              <label className="flex flex-col items-center justify-center h-48 border border-dashed border-border hover:border-foreground/30 transition-colors cursor-pointer bg-secondary rounded-md">
                 <Upload size={24} strokeWidth={1} className="text-muted-foreground mb-3" />
                 <span className="text-xs text-muted-foreground font-body">
                   {file ? file.name : "Clique para enviar sua imagem"}
@@ -94,7 +94,7 @@ Imagem: ${imageUrl}`;
                     key={s}
                     onClick={() => setSelectedSize(i)}
                     className={`text-xs font-body px-4 py-2.5 border transition-colors ${
-                      selectedSize === i ? "border-foreground text-foreground" : "border-border text-muted-foreground hover:border-foreground/40"
+                      selectedSize === i ? "border-foreground text-foreground bg-foreground/10" : "border-border text-muted-foreground hover:border-foreground/40"
                     }`}
                   >
                     {s}
@@ -112,7 +112,7 @@ Imagem: ${imageUrl}`;
                     key={m}
                     onClick={() => setSelectedMaterial(i)}
                     className={`text-xs font-body px-4 py-2.5 border transition-colors ${
-                      selectedMaterial === i ? "border-foreground text-foreground" : "border-border text-muted-foreground hover:border-foreground/40"
+                      selectedMaterial === i ? "border-foreground text-foreground bg-foreground/10" : "border-border text-muted-foreground hover:border-foreground/40"
                     }`}
                   >
                     {m}
@@ -122,27 +122,29 @@ Imagem: ${imageUrl}`;
             </div>
 
             {/* Notes */}
-            <div>
+            <div className="md:col-span-2">
               <p className="text-xs font-display tracking-widest mb-3">OBSERVAÇÕES</p>
               <textarea
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder="Descreva como quer seu quadro..."
-                className="w-full h-32 bg-secondary border border-border text-foreground font-body text-sm p-4 resize-none focus:outline-none focus:border-foreground/40 transition-colors placeholder:text-muted-foreground"
+                className="w-full h-32 bg-secondary border border-border text-foreground font-body text-sm p-4 resize-none focus:outline-none focus:border-foreground/40 transition-colors placeholder:text-muted-foreground rounded-md"
               />
             </div>
 
             {/* Submit */}
-            <Button variant="metal" size="xl" onClick={handleSubmit} disabled={isUploading} className="w-full">
-              {isUploading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  ENVIANDO IMAGEM...
-                </>
-              ) : (
-                "SOLICITAR ORÇAMENTO"
-              )}
-            </Button>
+            <div className="md:col-span-2">
+              <Button variant="metal" size="xl" onClick={handleSubmit} disabled={isUploading} className="w-full">
+                {isUploading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ENVIANDO IMAGEM...
+                  </>
+                ) : (
+                  "SOLICITAR ORÇAMENTO"
+                )}
+              </Button>
+            </div>
           </div>
         </motion.div>
       </div>
