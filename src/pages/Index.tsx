@@ -39,7 +39,7 @@ const testimonials = [
 const Index = () => {
   const { data: dbProducts } = useProducts();
   const { data: config } = useSiteConfig();
-  const videoModules = import.meta.glob('../../supabase/images/*.{mp4,MP4}', { eager: true, query: '?url', import: 'default' });
+  const videoModules = import.meta.glob('../../supabase/images/**/*.{mp4,MP4}', { eager: true, query: '?url', import: 'default' });
   const videoList = Object.values(videoModules) as string[];
 
   const allProducts = useMemo(() => {
@@ -308,5 +308,6 @@ const Index = () => {
 };
 
 export default Index;
+
 
 
