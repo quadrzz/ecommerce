@@ -12,6 +12,8 @@ import lucasAvatar from "@/assets/avatars/lucas.png";
 import camilaAvatar from "@/assets/avatars/camila.png";
 import pedroAvatar from "@/assets/avatars/pedro.png";
 import producaoVideo from "@/components/manager/produção.mp4";
+import Autoplay from "embla-carousel-autoplay";
+import { useSupabaseVideos } from "@/hooks/useSupabaseVideos";
 import { Printer, Shield, Paintbrush, Package, MessageCircle, BadgeCheck } from "lucide-react";
 import {
   Carousel,
@@ -38,6 +40,8 @@ const testimonials = [
 const Index = () => {
   const { data: dbProducts } = useProducts();
   const { data: config } = useSiteConfig();
+  const { data: videos } = useSupabaseVideos();
+  const videoList = videos && videos.length > 0 ? videos : [producaoVideo];
 
   const allProducts = useMemo(() => {
     const fromDb = (dbProducts || []).map((p) => ({
@@ -242,14 +246,7 @@ const Index = () => {
               viewport={{ once: true }}
               transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
               className="overflow-hidden metal-border bg-secondary aspect-[9/16] md:aspect-[3/4] lg:aspect-[9/16] rounded">
-              <video
-                src={producaoVideo}
-                autoPlay
-                muted
-                loop
-                playsInline
-                className="w-full h-full object-cover"
-              />
+              <Carousel opts={{ align: "start", loop: true }} plugins={[Autoplay({ delay: 3000, stopOnInteraction: false })]} className="w-full h-full"><CarouselContent className="h-full">{videoList.map((vid, idx) => (<CarouselItem key={idx} className="h-full"><video src={vid} autoPlay muted loop playsInline className="w-full h-full object-cover" /></CarouselItem>))}</CarouselContent></Carousel>
             </motion.div>
           </div>
         </div>
