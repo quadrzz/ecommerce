@@ -96,17 +96,6 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Frete Grátis Banner */}
-      <div className="bg-orange-500 py-3 overflow-hidden">
-        <div className="flex animate-marquee whitespace-nowrap">
-          {[...Array(8)].map((_, i) => (
-            <span key={i} className="text-black font-display text-sm md:text-base tracking-wider px-8">
-              🚚 FRETE GRÁTIS A PARTIR DE R$149 • FRETE GRÁTIS A PARTIR DE R$149 • FRETE GRÁTIS A PARTIR DE R$149 • 
-            </span>
-          ))}
-        </div>
-      </div>
-
       {/* Categories */}
       <section className="py-20 md:py-32">
         <div className="max-w-7xl mx-auto px-4 md:px-8">
@@ -114,7 +103,7 @@ const Index = () => {
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
-            className="text-2xl md:text-4xl mb-12">
+            className="text-2xl md:text-4xl mb-12 text-center">
             
             CATEGORIAS
           </motion.h2>
@@ -144,9 +133,9 @@ const Index = () => {
       {/* Featured products */}
       <section className="py-20 md:py-32 bg-secondary/30">
         <div className="max-w-7xl mx-auto px-4 md:px-8">
-          <div className="flex justify-between items-end mb-12">
+          <div className="flex flex-col items-center mb-12">
             <h2 className="text-2xl md:text-4xl">MAIS VENDIDOS</h2>
-            <Link to="/colecao" className="hidden md:inline-flex text-xs font-display tracking-widest border-b border-foreground pb-1 hover:text-muted-foreground transition-colors uppercase">
+            <Link to="/colecao" className="md:hidden mt-4 text-xs font-display tracking-widest border-b border-foreground pb-1 hover:text-muted-foreground transition-colors uppercase">
               Ver toda a coleção
             </Link>
           </div>
@@ -229,10 +218,10 @@ const Index = () => {
         </div>
       </section>
 
-      {/* O Que Dizem */}
+{/* O Que Dizem */}
       <section className="py-20 md:py-32">
         <div className="max-w-7xl mx-auto px-4 md:px-8">
-          <h2 className="text-2xl md:text-4xl mb-12">O QUE DIZEM</h2>
+          <h2 className="text-2xl md:text-4xl mb-12 text-center">O QUE DIZEM</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {testimonials.map((t, i) =>
             <motion.div
@@ -274,7 +263,7 @@ const Index = () => {
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
-            className="text-2xl md:text-4xl mb-12">
+            className="text-2xl md:text-4xl mb-12 text-center">
             BASTIDORES
           </motion.h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
