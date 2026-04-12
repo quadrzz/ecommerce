@@ -1,4 +1,4 @@
-﻿import { useMemo } from "react";
+import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -234,21 +234,28 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Before & After */}
+      {/* Mosaico */}
       <section className="py-20 md:py-32 bg-secondary">
         <div className="max-w-7xl mx-auto px-4 md:px-8">
-          <h2 className="text-2xl md:text-4xl mb-12">ANTES E DEPOIS</h2>
+          <h2 className="text-2xl md:text-4xl mb-12 text-center tracking-wider">LANÇAMENTO MOSAICO</h2>
           <motion.div
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
-            className="overflow-hidden metal-border">
+            className="max-w-xs md:max-w-sm mx-auto overflow-hidden metal-border rounded-lg aspect-[9/16] relative shadow-2xl">
             
-            <img src={beforeAfterImage} alt="Antes e depois com quadros QUADRZZ" className="w-full object-cover" loading="lazy" />
+            <video src={mosaicoVideo} autoPlay muted loop playsInline className="w-full h-full object-cover" />
           </motion.div>
-          <p className="mt-6 text-muted-foreground font-body text-center max-w-md mx-auto">
-            Um quadro QUADRZZ transforma qualquer ambiente. Presença que se sente.
+          <p className="mt-8 text-muted-foreground font-body text-center max-w-md mx-auto text-lg pt-4">
+            A junção de várias placas de metal premium para formar uma imagem só.
           </p>
+          <div className="mt-8 flex justify-center pb-2">
+            <Link to="/personalizar">
+              <Button variant="metal" size="xl" className="shadow-[0_0_15px_rgba(255,165,0,0.4)] px-10 text-sm tracking-wider">
+                PERSONALIZAR MEU QUADRO
+              </Button>
+            </Link>
+          </div>
         </div>
       </section>
 

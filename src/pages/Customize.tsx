@@ -4,7 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Upload, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
-const sizes = ["21x30cm (A4)"];
+const sizes = [
+  "1 Placa (21x30cm - Padrão)",
+  "Mosaico 3 Placas (Horizontal)",
+  "Mosaico 4 Placas (2x2)",
+  "Mosaico 6 Placas (3x2)",
+  "Mosaico 9 Placas (3x3)"
+];
 const materials = ["Alumínio Premium", "MDF Alta Densidade"];
 
 const Customize = () => {
