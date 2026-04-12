@@ -26,14 +26,22 @@ const ProductDetail = () => {
 
   // Size options
   const sizes = ["A4 (21x30cm)", "A3 (30x42cm)"];
+  const sizePrices = [37.90, 67.90]; // A4, A3 base prices (no frame)
   
-  // Frame options
-  const frames = [
-    { name: "Sem moldura", price: 0 },
-    { name: "Com moldura - Preto", price: 10 },
-    { name: "Com moldura - Branco", price: 10 },
-    { name: "Com moldura - Amadeirado", price: 10 },
+  // Frame options - additional price varies by size
+  const frameOptions = [
+    { name: "Sem moldura" },
+    { name: "Com moldura - Preto" },
+    { name: "Com moldura - Branco" },
+    { name: "Com moldura - Amadeirado" },
   ];
+  
+  // For A4: 37.90 + 10 = 47.90 (with frame)
+  // For A3: 67.90 + 20 = 87.90 (with frame)
+  const getFramePrice = (frameIndex: number, sizeIndex: number) => {
+    if (frameIndex === 0) return 0; // No frame
+    return sizeIndex === 0 ? 10 : 20; // A4: +10, A3: +20
+  };
   
   // Material
   const materials = ["Placa de Metal Premium"];
@@ -62,8 +70,8 @@ const ProductDetail = () => {
   // Handle promo prices
   const hasPromo = product && "isPromo" in product && product.isPromo && "promoDiscount" in product;
   const promoDiscount = hasPromo ? (product as any).promoDiscount : 0;
-  const basePrice = 37.90;
-  const framePrice = frames[selectedFrame].price;
+  const basePrice = sizePrices[selectedSize];
+  const framePrice = getFramePrice(selectedFrame, selectedSize);
   const finalPrice = hasPromo ? ((basePrice + framePrice) * (1 - promoDiscount! / 100)) : (basePrice + framePrice);
   const isLowStock = product && "stockCount" in product && (product as any).stockCount <= 5;
 
@@ -94,13 +102,13 @@ const ProductDetail = () => {
       image: product.image,
       size: sizes[selectedSize],
       material: "Placa de Metal Premium",
-      frame: frames[selectedFrame].name,
+      frame: frameOptions[selectedFrame].name,
       quantity: 1,
     });
   };
 
   const handleWhatsApp = () => {
-    const message = `Olá! Gostaria de saber mais sobre o produto:%0A%0A*${product.name}*%0ATamanho: ${sizes[selectedSize]}%0AMoldura: ${frames[selectedFrame].name}%0AMaterial: Placa de Metal Premium%0APreço: R$ ${finalPrice.toFixed(2)}`;
+    const message = `Olá! Gostaria de saber mais sobre o produto:%0A%0A*${product.name}*%0ATamanho: ${sizes[selectedSize]}%0AMoldura: ${frameOptions[selectedFrame].name}%0AMaterial: Placa de Metal Premium%0APreço: R$ ${finalPrice.toFixed(2)}`;
     window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${message}`, '_blank');
   };
 
@@ -181,7 +189,7 @@ const ProductDetail = () => {
             <div className="mt-6">
               <p className="text-xs font-display tracking-widest mb-3">MOLDURA</p>
               <div className="flex flex-wrap gap-2">
-                {frames.map((frame, i) => (
+                {frameOptions.map((frame, i) => (
                   <button
                     key={frame.name}
                     onClick={() => setSelectedFrame(i)}
@@ -219,7 +227,7 @@ const ProductDetail = () => {
                       image: product.image,
                       size: sizes[selectedSize],
                       material: "Placa de Metal Premium",
-                      frame: frames[selectedFrame].name,
+                      frame: frameOptions[selectedFrame].name,
                       quantity: 2,
                     });
                     setShowUpsell(false);
@@ -255,7 +263,7 @@ const ProductDetail = () => {
                 </div>
                 <div>
                   <p className="text-muted-foreground">Moldura</p>
-                  <p className="text-foreground">{frames[selectedFrame].name}</p>
+                  <p className="text-foreground">{frameOptions[selectedFrame].name}</p>
                 </div>
                 <div>
                   <p className="text-muted-foreground">Impressão</p>
