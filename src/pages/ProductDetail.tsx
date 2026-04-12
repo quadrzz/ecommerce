@@ -21,7 +21,6 @@ const ProductDetail = () => {
   const { data: dbProduct, isLoading } = useProduct(!staticProduct && id ? id : "");
 
   const [selectedSize, setSelectedSize] = useState(0);
-  const [selectedMaterial, setSelectedMaterial] = useState(0);
   const [selectedFrame, setSelectedFrame] = useState(0);
   const [showUpsell, setShowUpsell] = useState(true);
 
@@ -38,7 +37,7 @@ const ProductDetail = () => {
   
   // Material
   const materials = ["Placa de Metal Premium"];
-
+  
   // Countdown for promotions
   const showTimer = useCountdown(id || "default", 2);
 
@@ -63,7 +62,7 @@ const ProductDetail = () => {
   // Handle promo prices
   const hasPromo = product && "isPromo" in product && product.isPromo && "promoDiscount" in product;
   const promoDiscount = hasPromo ? (product as any).promoDiscount : 0;
-  const basePrice = product?.price ?? 0;
+  const basePrice = 37.90;
   const framePrice = frames[selectedFrame].price;
   const finalPrice = hasPromo ? ((basePrice + framePrice) * (1 - promoDiscount! / 100)) : (basePrice + framePrice);
   const isLowStock = product && "stockCount" in product && (product as any).stockCount <= 5;
@@ -94,14 +93,14 @@ const ProductDetail = () => {
       price: finalPrice,
       image: product.image,
       size: sizes[selectedSize],
-      material: materials[selectedMaterial],
+      material: "Placa de Metal Premium",
       frame: frames[selectedFrame].name,
       quantity: 1,
     });
   };
 
   const handleWhatsApp = () => {
-    const message = `Olá! Gostaria de saber mais sobre o produto:%0A%0A*${product.name}*%0ATamanho: ${sizes[selectedSize]}%0AMoldura: ${frames[selectedFrame].name}%0AMaterial: ${materials[selectedMaterial]}%0APreço: R$ ${finalPrice.toFixed(2)}`;
+    const message = `Olá! Gostaria de saber mais sobre o produto:%0A%0A*${product.name}*%0ATamanho: ${sizes[selectedSize]}%0AMoldura: ${frames[selectedFrame].name}%0AMaterial: Placa de Metal Premium%0APreço: R$ ${finalPrice.toFixed(2)}`;
     window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${message}`, '_blank');
   };
 
@@ -196,23 +195,6 @@ const ProductDetail = () => {
               </div>
             </div>
 
-            <div className="mt-6">
-              <p className="text-xs font-display tracking-widest mb-3">MATERIAL</p>
-              <div className="flex flex-wrap gap-2">
-                {materials.map((mat, i) => (
-                  <button
-                    key={mat}
-                    onClick={() => setSelectedMaterial(i)}
-                    className={`text-xs font-body px-4 py-2.5 border transition-colors ${
-                      selectedMaterial === i ? "border-foreground text-foreground" : "border-border text-muted-foreground hover:border-foreground/40"
-                    }`}
-                  >
-                    {mat}
-                  </button>
-                ))}
-              </div>
-            </div>
-
             <div className="mt-8 hidden md:flex gap-4">
               <button onClick={handleAddToCart} className="flex-1 py-4 px-6 border border-border text-xs font-display tracking-widest hover:bg-secondary transition-colors">
                 ADICIONAR AO CARRINHO
@@ -236,7 +218,7 @@ const ProductDetail = () => {
                       price: finalPrice,
                       image: product.image,
                       size: sizes[selectedSize],
-                      material: materials[selectedMaterial],
+                      material: "Placa de Metal Premium",
                       frame: frames[selectedFrame].name,
                       quantity: 2,
                     });
@@ -265,7 +247,7 @@ const ProductDetail = () => {
               <div className="grid grid-cols-2 gap-4 text-xs font-body">
                 <div>
                   <p className="text-muted-foreground">Material</p>
-                  <p className="text-foreground">{materials[selectedMaterial]}</p>
+                  <p className="text-foreground">Placa de Metal Premium</p>
                 </div>
                 <div>
                   <p className="text-muted-foreground">Tamanho</p>
