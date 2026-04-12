@@ -168,7 +168,7 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Testimonials */}
+      {/* Ofertas Especiais */}
       <section className="py-20 md:py-32">
         <div className="max-w-7xl mx-auto px-4 md:px-8">
           <h2 className="text-2xl md:text-4xl mb-12">OFERTAS ESPECIAIS</h2>
@@ -195,7 +195,30 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Testimonials */}
+      {/* Resultados Reais */}
+      <section className="py-20 md:py-32 bg-secondary/30">
+        <div className="max-w-7xl mx-auto px-4 md:px-8">
+          <motion.h2
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            className="text-2xl md:text-4xl mb-4 text-center">
+            RESULTADOS REAIS
+          </motion.h2>
+          <p className="text-muted-foreground font-body text-center max-w-md mx-auto mb-12">
+            Veja como ficam os quadros na parede. Fotos e vídeos reais dos nossos clientes.
+          </p>
+          <div className="relative w-full max-w-4xl mx-auto">
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-orange-500/20 blur-[100px] rounded-[100%] pointer-events-none -z-10" />
+            <Carousel opts={{ align: "start", loop: true }} plugins={[Autoplay({ delay: 3000, stopOnInteraction: false })]} className="w-full"><CarouselContent className="-ml-2 md:-ml-4">{videoList.map((vid, idx) => (<CarouselItem key={idx} className="pl-2 md:pl-4 basis-full md:basis-1/2"><div className="aspect-[3/4] bg-secondary overflow-hidden metal-border"><video src={vid} autoPlay muted loop playsInline className="w-full h-full object-cover" /></div></CarouselItem>))}</CarouselContent>
+              <CarouselPrevious className="absolute -left-12 top-1/2 -translate-y-1/2 border-border/50 hover:bg-background hidden md:flex" />
+              <CarouselNext className="absolute -right-12 top-1/2 -translate-y-1/2 border-border/50 hover:bg-background hidden md:flex" />
+            </Carousel>
+          </div>
+        </div>
+      </section>
+
+      {/* O Que Dizem */}
       <section className="py-20 md:py-32">
         <div className="max-w-7xl mx-auto px-4 md:px-8">
           <h2 className="text-2xl md:text-4xl mb-12">O QUE DIZEM</h2>
