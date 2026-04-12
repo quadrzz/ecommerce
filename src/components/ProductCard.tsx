@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import type { Product } from "@/data/products";
-import { Flame, Star } from "lucide-react";
+import { Flame } from "lucide-react";
 
 const ProductCard = ({ product, index = 0 }: { product: Product; index?: number }) => {
   const hasPromo = product.isPromo && product.promoDiscount;
@@ -38,10 +38,6 @@ const ProductCard = ({ product, index = 0 }: { product: Product; index?: number 
             )}
           </div>
         )}
-        <div className="absolute top-3 right-3 flex items-center gap-1 bg-background/80 backdrop-blur-sm px-2 py-1 rounded">
-          <Star size={10} className="text-orange-500 fill-orange-500" />
-          <span className="text-[10px] font-display text-foreground">4.8</span>
-        </div>
         <div className="absolute inset-x-0 bottom-0 p-4 bg-gradient-to-t from-background/90 to-transparent translate-y-full group-hover:translate-y-0 transition-transform duration-300 flex items-end justify-center">
           <span className="text-xs font-display tracking-widest border border-foreground/50 bg-background/50 backdrop-blur-sm px-4 py-2 metal-border font-bold">VER DETALHES</span>
         </div>
@@ -49,9 +45,6 @@ const ProductCard = ({ product, index = 0 }: { product: Product; index?: number 
       <div className="mt-4 space-y-1">
         <p className="text-xs text-muted-foreground font-body">{product.category}</p>
         <h3 className="text-sm font-display tracking-wider">{product.name}</h3>
-        <p className="text-xs text-orange-400/80 font-body italic line-clamp-1">
-          Para quem não aceita o comum
-        </p>
         <div className="flex items-center gap-2">
           {hasPromo ? (
             <>

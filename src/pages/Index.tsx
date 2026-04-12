@@ -75,68 +75,25 @@ const Index = () => {
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], staggerChildren: 0.2 }}
             className="max-w-2xl">
             
-            <div className="inline-flex items-center gap-2 bg-orange-500/20 border border-orange-500/30 px-3 py-1.5 rounded-full mb-4">
-              <Zap size={14} className="text-orange-500" />
-              <span className="text-xs font-display tracking-wider text-orange-400 uppercase">Oferta por tempo limitado</span>
-            </div>
-            
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               className="text-4xl md:text-6xl lg:text-7xl leading-[0.95] drop-shadow-2xl uppercase">
               
-              Transforme sua parede em identidade. Não decore — declare quem você é.
+              Não decore sua parede. Declare quem você é.
             </motion.h1>
-            <p className="mt-4 text-lg md:text-xl text-foreground font-body leading-relaxed max-w-lg">
-              Quadros premium personalizados a partir de <span className="text-orange-400 font-bold">R$47,90</span> — qualidade HD, envio para todo o Brasil.
+            <p className="mt-6 text-base md:text-lg text-muted-foreground font-body leading-relaxed max-w-lg">
+              Quadros premium em alumínio e MDF. Personalização única, entrega para todo o Brasil.
             </p>
-            
-            <div className="mt-6 space-y-2">
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Gift size={16} className="text-orange-400" />
-                <span>Personalização gratuita</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Printer size={16} className="text-orange-400" />
-                <span>Impressão em alta definição (HD)</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Package size={16} className="text-orange-400" />
-                <span>Pronto para pendurar</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Truck size={16} className="text-orange-400" />
-                <span>Envio rápido para todo o Brasil</span>
-              </div>
-            </div>
-            
             <div className="mt-8 flex flex-wrap gap-4">
               <Link to="/colecao">
-                <Button variant="metal" size="xl" className="bg-orange-500 hover:bg-orange-600 text-black font-display tracking-wider">QUERO O MEU AGORA</Button>
+                <Button variant="metal" size="xl">VER COLEÇÃO</Button>
               </Link>
               <Link to="/personalizar">
-                <Button variant="outline" size="xl" className="border-orange-500 text-orange-500 hover:bg-orange-500/10 font-display tracking-wider">PERSONALIZAR MINHA ARTE</Button>
+                <Button variant="outline" size="xl">PERSONALIZAR MEU QUADRO</Button>
               </Link>
             </div>
           </motion.div>
-        </div>
-      </section>
-
-      {/* Offer Banner */}
-      <section className="bg-orange-500/10 border-y border-orange-500/20 py-4">
-        <div className="max-w-7xl mx-auto px-4 md:px-8 flex flex-wrap items-center justify-center gap-6 md:gap-12">
-          <div className="flex items-center gap-2">
-            <Truck size={20} className="text-orange-500" />
-            <span className="text-sm font-body text-foreground">Frete Grátis a partir de R$149</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Gift size={20} className="text-orange-500" />
-            <span className="text-sm font-body text-foreground">Brinde exclusivo Quadrzz</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Zap size={20} className="text-orange-500" />
-            <span className="text-sm font-body text-foreground">Desconto de lançamento</span>
-          </div>
         </div>
       </section>
 
@@ -166,7 +123,6 @@ const Index = () => {
                     <img src={cat.image} alt={cat.name} className="w-full h-full object-cover transition-all duration-400 group-hover:scale-105" loading="lazy" />
                     <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
                     <span className="absolute bottom-4 left-4 font-display text-xs md:text-sm tracking-wider text-foreground">{cat.name}</span>
-                      <span className="absolute top-4 left-4 text-[10px] md:text-xs font-display tracking-wider text-muted-foreground/80">{cat.tagline}</span>
                   </div>
                 </Link>
               </motion.div>
@@ -228,7 +184,7 @@ const Index = () => {
           </p>
           <div className="relative w-full max-w-4xl mx-auto">
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-orange-500/20 blur-[100px] rounded-[100%] pointer-events-none -z-10" />
-            <Carousel opts={{ align: "start", loop: true }} plugins={[Autoplay({ delay: 3000, stopOnInteraction: false })]} className="w-full"><CarouselContent className="-ml-2 md:-ml-4">{videoList.map((vid, idx) => (<CarouselItem key={idx} className="pl-2 md:pl-4 basis-full md:basis-1/2"><div className="aspect-[3/4] bg-secondary overflow-hidden metal-border relative"><video src={vid} autoPlay muted loop playsInline className="w-full h-full object-cover" /><div className="absolute bottom-4 left-4 bg-background/90 backdrop-blur-sm px-3 py-2 rounded"><p className="text-xs font-body text-foreground italic">"Ficou surreal no meu quarto"</p></div></div></CarouselItem>))}</CarouselContent>
+            <Carousel opts={{ align: "start", loop: true }} plugins={[Autoplay({ delay: 3000, stopOnInteraction: false })]} className="w-full"><CarouselContent className="-ml-2 md:-ml-4">{videoList.map((vid, idx) => (<CarouselItem key={idx} className="pl-2 md:pl-4 basis-full md:basis-1/2"><div className="aspect-[3/4] bg-secondary overflow-hidden metal-border"><video src={vid} autoPlay muted loop playsInline className="w-full h-full object-cover" /></div></CarouselItem>))}</CarouselContent>
               <CarouselPrevious className="absolute -left-12 top-1/2 -translate-y-1/2 border-border/50 hover:bg-background hidden md:flex" />
               <CarouselNext className="absolute -right-12 top-1/2 -translate-y-1/2 border-border/50 hover:bg-background hidden md:flex" />
             </Carousel>
@@ -370,16 +326,16 @@ const Index = () => {
       {/* Final CTA */}
       <section className="py-20 md:py-32 bg-secondary">
         <div className="max-w-7xl mx-auto px-4 md:px-8 text-center">
-          <h2 className="text-3xl md:text-5xl mb-6">SUA PAREDE MERECE PRESENÇA. SUA IDENTIDADE NÃO PODE ESPERAR.</h2>
+          <h2 className="text-3xl md:text-5xl mb-6">SUA PAREDE MERECE PRESENÇA.</h2>
           <p className="text-muted-foreground font-body mb-10 max-w-md mx-auto">
             Escolha seu quadro ou crie o seu. Alumínio premium, impressão HD, entrega segura.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link to="/colecao">
-              <Button variant="metal" size="xl" className="bg-orange-500 hover:bg-orange-600 text-black font-display tracking-wider">COMPRAR AGORA</Button>
+              <Button variant="metal" size="xl">VER COLEÇÃO</Button>
             </Link>
             <Link to="/personalizar">
-              <Button variant="outline" size="xl" className="border-orange-500 text-orange-500 hover:bg-orange-500/10 font-display tracking-wider">PERSONALIZAR MINHA ARTE</Button>
+              <Button variant="outline" size="xl">PERSONALIZAR</Button>
             </Link>
           </div>
         </div>
