@@ -10,6 +10,7 @@ export interface CartItem {
   image: string;
   size: string;
   material: string;
+  frame?: string;
   quantity: number;
 }
 

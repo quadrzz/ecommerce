@@ -22,7 +22,22 @@ const ProductDetail = () => {
 
   const [selectedSize, setSelectedSize] = useState(0);
   const [selectedMaterial, setSelectedMaterial] = useState(0);
+  const [selectedFrame, setSelectedFrame] = useState(0);
   const [showUpsell, setShowUpsell] = useState(true);
+
+  // Size options
+  const sizes = ["A4 (21x30cm)", "A3 (30x42cm)"];
+  
+  // Frame options
+  const frames = [
+    { name: "Sem moldura", price: 0 },
+    { name: "Com moldura - Preto", price: 10 },
+    { name: "Com moldura - Branco", price: 10 },
+    { name: "Com moldura - Amadeirado", price: 10 },
+  ];
+  
+  // Material
+  const materials = ["Placa de Metal Premium"];
 
   // Countdown for promotions
   const showTimer = useCountdown(id || "default", 2);
@@ -48,7 +63,9 @@ const ProductDetail = () => {
   // Handle promo prices
   const hasPromo = product && "isPromo" in product && product.isPromo && "promoDiscount" in product;
   const promoDiscount = hasPromo ? (product as any).promoDiscount : 0;
-  const finalPrice = hasPromo ? (product!.price as number * (1 - promoDiscount! / 100)) : (product?.price ?? 0);
+  const basePrice = product?.price ?? 0;
+  const framePrice = frames[selectedFrame].price;
+  const finalPrice = hasPromo ? ((basePrice + framePrice) * (1 - promoDiscount! / 100)) : (basePrice + framePrice);
   const isLowStock = product && "stockCount" in product && (product as any).stockCount <= 5;
 
   if (isLoading && !staticProduct) {
@@ -74,16 +91,17 @@ const ProductDetail = () => {
     addToCart({
       productId: product.id,
       name: product.name,
-      price: hasPromo ? finalPrice : product.price,
+      price: finalPrice,
       image: product.image,
-      size: product.sizes[selectedSize],
-      material: product.materials[selectedMaterial],
+      size: sizes[selectedSize],
+      material: materials[selectedMaterial],
+      frame: frames[selectedFrame].name,
       quantity: 1,
     });
   };
 
   const handleWhatsApp = () => {
-    const message = `Olá! Gostaria de saber mais sobre o produto:%0A%0A*${product.name}*%0ATamanho: ${product.sizes[selectedSize]}%0AMaterial: ${product.materials[selectedMaterial]}%0APreço: R$ ${(hasPromo ? finalPrice : product.price).toFixed(2)}`;
+    const message = `Olá! Gostaria de saber mais sobre o produto:%0A%0A*${product.name}*%0ATamanho: ${sizes[selectedSize]}%0AMoldura: ${frames[selectedFrame].name}%0AMaterial: ${materials[selectedMaterial]}%0APreço: R$ ${finalPrice.toFixed(2)}`;
     window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${message}`, '_blank');
   };
 
@@ -119,7 +137,7 @@ const ProductDetail = () => {
                   R$ {finalPrice.toFixed(2).replace(".", ",")}
                 </p>
                 <p className="text-lg text-muted-foreground font-body tabular-nums line-through">
-                  R$ {product.price.toFixed(2).replace(".", ",")}
+                  R$ {(basePrice + framePrice).toFixed(2).replace(".", ",")}
                 </p>
                 <span className="bg-red-600 text-white text-[10px] font-bold px-2 py-0.5">
                   -{promoDiscount}% OFF
@@ -127,7 +145,7 @@ const ProductDetail = () => {
               </div>
             ) : (
               <p className="mt-2 text-2xl font-display tabular-nums">
-                R$ {product.price.toFixed(2).replace(".", ",")}
+                R$ {finalPrice.toFixed(2).replace(".", ",")}
               </p>
             )}
 
@@ -147,7 +165,7 @@ const ProductDetail = () => {
             <div className="mt-8">
               <p className="text-xs font-display tracking-widest mb-3">TAMANHO</p>
               <div className="flex flex-wrap gap-2">
-                {product.sizes.map((size, i) => (
+                {sizes.map((size, i) => (
                   <button
                     key={size}
                     onClick={() => setSelectedSize(i)}
@@ -162,9 +180,26 @@ const ProductDetail = () => {
             </div>
 
             <div className="mt-6">
+              <p className="text-xs font-display tracking-widest mb-3">MOLDURA</p>
+              <div className="flex flex-wrap gap-2">
+                {frames.map((frame, i) => (
+                  <button
+                    key={frame.name}
+                    onClick={() => setSelectedFrame(i)}
+                    className={`text-xs font-body px-4 py-2.5 border transition-colors ${
+                      selectedFrame === i ? "border-foreground text-foreground" : "border-border text-muted-foreground hover:border-foreground/40"
+                    }`}
+                  >
+                    {frame.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="mt-6">
               <p className="text-xs font-display tracking-widest mb-3">MATERIAL</p>
               <div className="flex flex-wrap gap-2">
-                {product.materials.map((mat, i) => (
+                {materials.map((mat, i) => (
                   <button
                     key={mat}
                     onClick={() => setSelectedMaterial(i)}
@@ -200,8 +235,9 @@ const ProductDetail = () => {
                       name: product.name,
                       price: finalPrice,
                       image: product.image,
-                      size: product.sizes[selectedSize],
-                      material: product.materials[selectedMaterial],
+                      size: sizes[selectedSize],
+                      material: materials[selectedMaterial],
+                      frame: frames[selectedFrame].name,
                       quantity: 2,
                     });
                     setShowUpsell(false);
@@ -229,19 +265,19 @@ const ProductDetail = () => {
               <div className="grid grid-cols-2 gap-4 text-xs font-body">
                 <div>
                   <p className="text-muted-foreground">Material</p>
-                  <p className="text-foreground">{product.materials[selectedMaterial]}</p>
+                  <p className="text-foreground">{materials[selectedMaterial]}</p>
                 </div>
                 <div>
                   <p className="text-muted-foreground">Tamanho</p>
-                  <p className="text-foreground">{product.sizes[selectedSize]}</p>
+                  <p className="text-foreground">{sizes[selectedSize]}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground">Moldura</p>
+                  <p className="text-foreground">{frames[selectedFrame].name}</p>
                 </div>
                 <div>
                   <p className="text-muted-foreground">Impressão</p>
                   <p className="text-foreground">HD Premium</p>
-                </div>
-                <div>
-                  <p className="text-muted-foreground">Montagem</p>
-                  <p className="text-foreground">Pronto para pendurar</p>
                 </div>
               </div>
             </div>
