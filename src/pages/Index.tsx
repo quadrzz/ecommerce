@@ -13,7 +13,6 @@ import camilaAvatar from "@/assets/avatars/camila.png";
 import pedroAvatar from "@/assets/avatars/pedro.png";
 import producaoVideo from "@/components/manager/produção.mp4";
 import Autoplay from "embla-carousel-autoplay";
-import { useSupabaseVideos } from "@/hooks/useSupabaseVideos";
 import { Printer, Shield, Paintbrush, Package, MessageCircle, BadgeCheck } from "lucide-react";
 import {
   Carousel,
@@ -40,8 +39,8 @@ const testimonials = [
 const Index = () => {
   const { data: dbProducts } = useProducts();
   const { data: config } = useSiteConfig();
-  const { data: videos } = useSupabaseVideos();
-  const videoList = videos && videos.length > 0 ? videos : [producaoVideo];
+  const videoModules = import.meta.glob('../../supabase/images/*.{mp4,MP4}', { eager: true, query: '?url', import: 'default' });
+  const videoList = Object.values(videoModules) as string[];
 
   const allProducts = useMemo(() => {
     const fromDb = (dbProducts || []).map((p) => ({
@@ -309,4 +308,5 @@ const Index = () => {
 };
 
 export default Index;
+
 
