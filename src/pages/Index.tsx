@@ -7,7 +7,6 @@ import { products, categories } from "@/data/products";
 import { useProducts } from "@/hooks/useProducts";
 import { useSiteConfig } from "@/hooks/useSiteConfig";
 import heroImage from "@/assets/hero-main.jpg";
-import beforeAfterImage from "@/assets/before-after.jpg";
 import lucasAvatar from "@/assets/avatars/lucas.png";
 import camilaAvatar from "@/assets/avatars/camila.png";
 import pedroAvatar from "@/assets/avatars/pedro.png";
@@ -234,21 +233,30 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Before & After */}
-      <section className="py-20 md:py-32 bg-secondary">
+      {/* Promo Cards */}
+      <section className="py-20 md:py-32">
         <div className="max-w-7xl mx-auto px-4 md:px-8">
-          <h2 className="text-2xl md:text-4xl mb-12">ANTES E DEPOIS</h2>
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            className="overflow-hidden metal-border">
-            
-            <img src={beforeAfterImage} alt="Antes e depois com quadros QUADRZZ" className="w-full object-cover" loading="lazy" />
-          </motion.div>
-          <p className="mt-6 text-muted-foreground font-body text-center max-w-md mx-auto">
-            Um quadro QUADRZZ transforma qualquer ambiente. Presença que se sente.
-          </p>
+          <h2 className="text-2xl md:text-4xl mb-12">OFERTAS ESPECIAIS</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[
+              { title: "FRETE GRÁTIS", desc: "A partir de R$149", icon: "🚚" },
+              { title: "15% OFF", desc: "No primeiro pedido", icon: "🔥" },
+              { title: "PERSONALIZAÇÃO", desc: "Grátis em qualquer quadro", icon: "✨" },
+            ].map((promo, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                className="bg-secondary p-8 metal-border text-center"
+              >
+                <div className="text-4xl mb-4">{promo.icon}</div>
+                <h3 className="text-xl font-display tracking-wider mb-2">{promo.title}</h3>
+                <p className="text-muted-foreground font-body">{promo.desc}</p>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </section>
 
