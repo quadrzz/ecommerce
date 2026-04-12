@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+﻿import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,7 @@ import lucasAvatar from "@/assets/avatars/lucas.png";
 import camilaAvatar from "@/assets/avatars/camila.png";
 import pedroAvatar from "@/assets/avatars/pedro.png";
 import producaoVideo from "@/components/manager/produção.mp4";
+import mosaicoVideo from '../../supabase/images/compressed/naruto mosaico.mp4';
 import Autoplay from "embla-carousel-autoplay";
 import { Printer, Shield, Paintbrush, Package, MessageCircle, BadgeCheck } from "lucide-react";
 import {
@@ -311,6 +312,7 @@ const Index = () => {
 };
 
 export default Index;
+
 
 
 
