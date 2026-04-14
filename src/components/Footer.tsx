@@ -5,7 +5,7 @@ const Footer = () => (
     <div className="max-w-7xl mx-auto px-4 md:px-8 py-16">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
         <div>
-          <h3 className="text-xl mb-4">QUADRZZ</h3>
+          <img src="/logo-quadrzz.png" alt="Quadrzz" className="h-6 mb-4 object-contain" />
           <p className="text-sm text-muted-foreground font-body leading-relaxed">
             Transformamos identidade em arte de parede. Quadros em alumínio premium e MDF de alta densidade.
           </p>

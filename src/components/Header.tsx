@@ -36,11 +36,7 @@ const Header = () => {
           {/* Logo - Left */}
           <div className="flex justify-start z-50">
             <Link to="/" className="text-2xl font-display tracking-widest leading-none inline-block">
-              {config?.logo_url ? (
-                <img src={config.logo_url} alt="Quadrzz" className="h-6 md:h-8 object-contain" />
-              ) : (
-                "QUADRZZ"
-              )}
+                <img src="/logo-quadrzz.png" alt="Quadrzz" className="h-6 md:h-8 object-contain" />
             </Link>
           </div>
           
